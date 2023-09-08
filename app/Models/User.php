@@ -2,15 +2,19 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, MustVerifyEmail;
 
     /**
      * The attributes that are mass assignable.
@@ -18,9 +22,18 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
+        'first_name',
+        'middle_name',
+        'last_name',
+        'role_id',
         'email',
+        'phone',
+        'country_id',
+        'nationality_country_id',
+        'email_verified_at',
+        'phone_verified_at',
         'password',
+        'last_seen_at',
     ];
 
     /**
@@ -40,6 +53,89 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'phone_verified_at' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function language(): BelongsTo
+    {
+        return $this->belongsTo(Language::class);
+    }
+
+    public function country(): BelongsTo
+    {
+        return $this->belongsTo(Country::class);
+    }
+
+    public function nationality(): BelongsTo
+    {
+        return $this->belongsTo(Country::class, 'nationality_country_id');
+    }
+
+    public function role(): BelongsTo
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    public function image(): MorphOne
+    {
+        return $this->morphOne(Image::class, 'imageable');
+    }
+
+    public function groups(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'group_member', 'member_id', 'group_id');
+    }
+
+    public function activities(): HasMany
+    {
+        return $this->hasMany(Activity::class);
+    }
+
+    public function accounts(): HasMany
+    {
+        return $this->hasMany(UserAccount::class);
+    }
+
+    public function registeredCompanies(): HasMany
+    {
+        return $this->hasMany(Company::class,  'owner_id');
+    }
+
+    public function companies(): BelongsToMany
+    {
+        return $this->belongsToMany(Company::class, 'company_user', 'user_id', 'company_id');
+    }
+
+    public function hotelBookings(): HasMany
+    {
+        return $this->hasMany(HotelBooking::class);
+    }
+
+    public function hotelsServiceProvider(): HasMany
+    {
+        return $this->hasMany(HotelServiceProvider::class, 'service_provider_id');
+    }
+
+    public function transportBookings(): HasMany
+    {
+        return $this->hasMany(TransportBooking::class);
+    }
+
+    public function blogs(): HasMany
+    {
+        return $this->hasMany(Blog::class, 'author_id');
+    }
+
+    public function umrahs(): HasMany
+    {
+        return $this->hasMany(Umrah::class);
+    }
+
+    public function umrahsServiceProvider(): HasMany
+    {
+        return $this->hasMany(Umrah::class, 'service_provider_id');
+    }
 }
