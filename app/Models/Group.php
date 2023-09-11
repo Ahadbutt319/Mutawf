@@ -3,12 +3,16 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Model;
+use Spatie\Translatable\HasTranslations;
 
 class Group extends Model
 {
-    use HasFactory;
+    use HasFactory, HasTranslations;
+
+    // translatable fields
+    public $translatable = ['name', 'description'];
 
     /**
      * The attributes that are mass assignable.

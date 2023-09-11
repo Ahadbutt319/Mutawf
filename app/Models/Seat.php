@@ -6,12 +6,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Translatable\HasTranslations;
 
 class Seat extends Model
 {
-    use HasFactory;
+    use HasFactory, HasTranslations;
 
     public $timestamps = false;
+
+    // translatable fields
+    public $translatable = ['description'];
 
     /**
      * The attributes that are mass assignable.
