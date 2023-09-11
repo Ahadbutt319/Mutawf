@@ -23,6 +23,11 @@ class ResponseService
         return self::jsonResponse($message, $data, 422);
     }
 
+    public static function unauthorizedErrorResponse(string $message, $data = [])
+    {
+        return self::jsonResponse($message, $data, 403);
+    }
+
     public static function errorResponse(string $message, $data = [])
     {
         return self::jsonResponse($message, $data, 500);
