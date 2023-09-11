@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             CountriesSeeder::class,
             LanguagesSeader::class,
             CurrenciesSeader::class,
+            UsersSeeder::class,
         ]);
     }
 }
