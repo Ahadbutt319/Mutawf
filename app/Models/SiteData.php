@@ -5,10 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Translatable\HasTranslations;
 
 class SiteData extends Model
 {
-    use HasFactory;
+    use HasFactory, HasTranslations;
+
+    // translatable fields
+    public $translatable = ['title', 'content'];
 
     /**
      * The attributes that are mass assignable.
