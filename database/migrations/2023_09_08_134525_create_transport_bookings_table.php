@@ -19,8 +19,8 @@ return new class extends Migration
             $table->string('brn')->unique();
             $table->json('description')->nullable();
             $table->enum('status', ['pending', 'confirmed', 'in progress', 'cancelled']);
-            $table->timestamp('departure_at');
-            $table->timestamp('arrive_at');
+            $table->timestamp('departure_at')->nullable();
+            $table->timestamp('arrive_at')->nullable();
             $table->enum('departure_status', ['scheduled', 'delayed', 'departed']);
             $table->enum('arrival_status', ['scheduled', 'delayed', 'arrived']);
             $table->timestamps();

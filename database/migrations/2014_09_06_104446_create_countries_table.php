@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('abbr_2', 2);
             $table->string('abbr_3', 3);
             $table->string('code', 10);
-            $table->string('name', 30);
+            $table->string('name', 100);
         });
     }
 

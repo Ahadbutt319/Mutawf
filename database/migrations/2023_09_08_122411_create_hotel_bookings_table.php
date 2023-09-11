@@ -17,8 +17,8 @@ return new class extends Migration
             $table->foreignId('service_provider_id')->constrained('users');
             $table->foreignId('room_id')->constrained('rooms');
             $table->string('brn')->unique();
-            $table->timestamp('checkin_date_time');
-            $table->timestamp('checkout_date_time');
+            $table->timestamp('checkin_date_time')->nullable();
+            $table->timestamp('checkout_date_time')->nullable();
             $table->enum('status', ['pending', 'confirmed', 'in_progress', 'cancelled']);
             $table->enum('checkin_status', ['pending', 'checked in', 'no show']);
             $table->enum('checkout_status', ['pending', 'checked in', 'no show']);
