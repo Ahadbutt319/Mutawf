@@ -39,22 +39,44 @@ class VerificationService
             return ResponseService::notFoundErrorResponse('Email address not found.');
         }
 
-        if ($user->email_verification_code != $code) {
-            return ResponseService::errorResponse('Verification code is incorrect.');
-        }
-
-        $currentTime = now();
-
-        if (! $user->email_verification_code_expires || $currentTime > $user->email_verification_code_expires) {
-            return ResponseService::errorResponse('Verification code is expired.');
+        if (! self::isEmailVerificationCodeValid($user, $code)) {
+            return ResponseService::errorResponse('Verification code is either incorrect or expired.');
         }
 
         $user->update([
             'email_verification_code' => Null,
             'email_verification_code_expires' => Null,
-            'email_verified_at' => $currentTime
+            'email_verified_at' => now()
         ]);
 
         return ResponseService::successResponse('Email verified successfully.');
+    }
+
+    public static function isEmailVerificationCodeValid($user, $code)
+    {
+        if ($user->email_verification_code === $code) {
+
+            $currentTime = now();
+            if ($user->email_verification_code_expires && $currentTime <= $user->email_verification_code_expires) {
+                return true;
+            }
+
+            return false;
+        }
+        return false;        
+    }
+
+    public static function isPhoneVerificationCodeValid($user, $code)
+    {
+        if ($user->phone_verification_code === $code) {
+
+            $currentTime = now();
+            if ($user->phone_verification_code_expires && $currentTime <= $user->phone_verification_code_expires) {
+                return true;
+            }
+
+            return false;
+        }
+        return false;        
     }
 }

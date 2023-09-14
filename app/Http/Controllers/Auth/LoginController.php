@@ -58,8 +58,7 @@ class LoginController extends Controller
             }
 
             return ResponseService::unauthorizedErrorResponse('Credentials not matched.');
-
-        }  catch (Throwable $th) {
+        } catch (Throwable $th) {
             return ResponseService::errorResponse($th->getMessage());
         }
     }
