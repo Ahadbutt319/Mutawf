@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\VerificationController;
@@ -26,3 +27,9 @@ Route::post('/resend/email/verification', [VerificationController::class, 'resen
 Route::post('/resend/phone/verification', [VerificationController::class, 'resendPhoneVerification']);
 Route::post('/verify-email', [VerificationController::class, 'verifyEmail']);
 Route::post('/verify-phone', [VerificationController::class, 'verifyPhone']);
+
+Route::group(['middleware' => 'auth:api'], function () {
+    Route::get('/user', function () {
+        return auth()->user;
+    });
+});

@@ -42,9 +42,7 @@ class RegisterController extends Controller
                 return ResponseService::validationErrorResponse($validator->errors()->first());
             }
     
-            $country = Country::where('name', $data['country'])->first();
-
-            
+            $country = Country::where('name', $data['country'])->first();            
     
             $user = User::create([
                 'name' => $data['name'],
