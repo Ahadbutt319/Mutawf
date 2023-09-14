@@ -10,11 +10,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
+use Laravel\Passport\HasApiTokens;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, Notifiable, MustVerifyEmail;
+    use HasApiTokens, HasFactory, Notifiable;
+
+    const CUSTOMER_ROLE_ID = 1;
+    const AGENT_ROLE_ID = 2;
+    const ADMIN_ROLE_ID = 3;
 
     /**
      * The attributes that are mass assignable.
@@ -22,9 +26,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'first_name',
-        'middle_name',
-        'last_name',
+        'name',
         'role_id',
         'email',
         'phone',
@@ -32,6 +34,10 @@ class User extends Authenticatable
         'nationality_country_id',
         'email_verified_at',
         'phone_verified_at',
+        'email_verification_code',
+        'email_verification_code_expires',
+        'phone_verification_code',
+        'phone_verification_code_expires',
         'password',
         'last_seen_at',
     ];
@@ -54,10 +60,34 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'phone_verified_at' => 'datetime',
+        'email_verification_code_expires',
+        'phone_verification_code_expires',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    /**
+     * Find a user by their email address.
+     *
+     * @param  string  $email
+     * @return \App\Models\User|null
+     */
+    public static function findByEmail($email)
+    {
+        return static::where('email', $email)->first();
+    }
+
+    /**
+     * Find a user by their phone number.
+     *
+     * @param  string  $email
+     * @return \App\Models\User|null
+     */
+    public static function findByPhone($phone)
+    {
+        return static::where('phone', $phone)->first();
+    }
 
     public function language(): BelongsTo
     {
@@ -137,5 +167,10 @@ class User extends Authenticatable
     public function umrahsServiceProvider(): HasMany
     {
         return $this->hasMany(Umrah::class, 'service_provider_id');
+    }
+
+    public static function generateRandomCode(): int
+    {
+        return random_int(0, 999999);
     }
 }
