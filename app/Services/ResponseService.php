@@ -5,7 +5,7 @@ use Illuminate\Http\JsonResponse;
 
 class ResponseService
 {
-    private function jsonResponse($message, $data, $code): JsonResponse
+    private static function jsonResponse($message, $data, $code): JsonResponse
     {
         return response()->json([
             'message' => $message,
@@ -31,5 +31,10 @@ class ResponseService
     public static function errorResponse(string $message, $data = [])
     {
         return self::jsonResponse($message, $data, 500);
+    }
+
+    public static function notFoundErrorResponse(string $message, $data = [])
+    {
+        return self::jsonResponse($message, $data, 404);
     }
 }

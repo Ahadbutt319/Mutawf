@@ -13,16 +13,20 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('first_name');
-            $table->string('middle_name')->nullable();
-            $table->string('last_name');
+            $table->string('name');
             $table->foreignId('role_id')->constrained('roles');
-            $table->string('email')->unique();
-            $table->string('phone')->unique();
-            $table->foreignId('country_id')->constrained('countries');
-            $table->foreignId('nationality_country_id')->constrained('countries');
+            $table->string('email')->nullable()->unique();
+            $table->string('phone')->nullable()->unique();
+            $table->string('lat')->nullable();
+            $table->string('lng')->nullable();
+            $table->foreignId('country_id')->nullable()->constrained('countries');
+            $table->foreignId('nationality_country_id')->nullable()->constrained('countries');
             $table->timestamp('email_verified_at')->nullable();
             $table->timestamp('phone_verified_at')->nullable();
+            $table->string('email_verification_code', 8)->nullable();
+            $table->timestamp('email_verification_code_expires')->nullable();
+            $table->string('phone_verification_code', 8)->nullable();
+            $table->timestamp('phone_verification_code_expires')->nullable();
             $table->string('password');
             $table->timestamp('last_seen_at')->nullable();
             $table->rememberToken();

@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\Auth\VerificationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -14,6 +18,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+Route::post('/register', [RegisterController::class, 'register']);
+Route::post('/login', [LoginController::class, 'login']);
+Route::post('/forgot-password', [ForgotPasswordController::class, 'forgotPassword']);
+Route::post('/reset-password', [ResetPasswordController::class, 'resetPassword']);
+Route::post('/resend/email/verification', [VerificationController::class, 'resendEmailVerification']);
+Route::post('/resend/phone/verification', [VerificationController::class, 'resendPhoneVerification']);
+Route::post('/verify-email', [VerificationController::class, 'verifyEmail']);
+Route::post('/verify-phone', [VerificationController::class, 'verifyPhone']);
