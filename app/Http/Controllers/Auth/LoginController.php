@@ -25,9 +25,9 @@ class LoginController extends Controller
     {
         try {
             $data = $request->all();
-    
+
             $validator = $this->validateRequest($data);
-    
+
             if ($validator->fails()) {
                 return ResponseService::validationErrorResponse($validator->errors()->first());
             }
@@ -43,14 +43,22 @@ class LoginController extends Controller
             if (Auth::attempt($credentials)) {
                 $user = Auth::user();
 
-                if ($user->$usernameField == Null) {
-                    Auth::logout();
+                if ($user->$usernameField == 'email') {
+                    if ($user->email_verified_at == Null) {
+                        Auth::logout();
+                        return ResponseService::unauthorizedErrorResponse("Please verify your $usernameField first");
+                    }
+                }
 
-                    return ResponseService::unauthorizedErrorResponse("Please verify your $usernameField first");
+                if ($user->$usernameField == 'phone') {
+                    if ($user->phone_verified_at == Null) {
+                        Auth::logout();
+                        return ResponseService::unauthorizedErrorResponse("Please verify your $usernameField first");
+                    }
                 }
 
                 $token = $user->createToken('MyAppToken')->accessToken;
-    
+
                 return ResponseService::successResponse('Token created.', [
                     'token' => $token,
                     'user' => $user
