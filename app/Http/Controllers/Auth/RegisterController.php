@@ -35,15 +35,15 @@ class RegisterController extends Controller
     {
         try {
             $data = $request->all();
-    
+
             $validator = $this->validateRequest($data);
-    
+
             if ($validator->fails()) {
                 return ResponseService::validationErrorResponse($validator->errors()->first());
             }
-    
-            $country = Country::where('name', $data['country'])->first();            
-    
+
+            $country = Country::where('name', $data['country'])->first();
+
             $user = User::create([
                 'name' => $data['name'],
                 'email' => $data['email'] ?? Null,
@@ -55,8 +55,15 @@ class RegisterController extends Controller
                 'role_id' => User::CUSTOMER_ROLE_ID,
                 'password' => Hash::make($data['password'])
             ]);
-    
-            VerificationService::sendEmailVerificationCode($user);
+
+            if ( isset($data['email'])) {
+                VerificationService::sendEmailVerificationCode($user);
+            }
+
+            if ( isset($data['phone'])) {
+                VerificationService::sendPhoneVerificationCode($user);
+            }
+
 
             return ResponseService::successResponse('You are registered successfully. Please verify your email.');
 

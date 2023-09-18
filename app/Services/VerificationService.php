@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Events\SendSmsEvent;
 use App\Events\VerifyUserEmail;
 use App\Models\User;
 
@@ -27,7 +28,7 @@ class VerificationService
             'phone_verification_code' => $phoneVerificationCode,
             'phone_verification_code_expires' => now()->addMinutes(config('auth.verification.expire'))
         ]);
-
+        event(new SendSmsEvent($user, $phoneVerificationCode));
         // event(new VerifyUserPhone($user, $phoneVerificationCode));
     }
 
@@ -63,7 +64,7 @@ class VerificationService
 
             return false;
         }
-        return false;        
+        return false;
     }
 
     public static function isPhoneVerificationCodeValid($user, $code)
@@ -77,6 +78,6 @@ class VerificationService
 
             return false;
         }
-        return false;        
+        return false;
     }
 }
