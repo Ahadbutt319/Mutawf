@@ -30,6 +30,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'role_id',
         'email',
         'phone',
+        'lat',
+        'lng',
         'country_id',
         'nationality_country_id',
         'email_verified_at',
@@ -171,6 +173,6 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public static function generateRandomCode(): int
     {
-        return random_int(0, 999999);
+        return random_int(100000, 999999); // generate random code of six digits
     }
 }

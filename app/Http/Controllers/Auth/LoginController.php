@@ -43,24 +43,27 @@ class LoginController extends Controller
             if (Auth::attempt($credentials)) {
                 $user = Auth::user();
 
-                if ($user->$usernameField == 'email') {
-                    if ($user->email_verified_at == Null) {
-                        Auth::logout();
-                        return ResponseService::unauthorizedErrorResponse("Please verify your $usernameField first");
+                if (config('app.env') == 'production') {
+                    if ($usernameField == 'email') {
+                        if ($user->email_verified_at == Null) {
+                            Auth::logout();
+                            return ResponseService::unauthorizedErrorResponse("Please verify your $usernameField first");
+                        }
                     }
-                }
-
-                if ($user->$usernameField == 'phone') {
-                    if ($user->phone_verified_at == Null) {
-                        Auth::logout();
-                        return ResponseService::unauthorizedErrorResponse("Please verify your $usernameField first");
+    
+                    if ($usernameField == 'phone') {
+                        if ($user->phone_verified_at == Null) {
+                            Auth::logout();
+                            return ResponseService::unauthorizedErrorResponse("Please verify your $usernameField first");
+                        }
                     }
                 }
 
                 $token = $user->createToken('MyAppToken')->accessToken;
 
+                $user['token'] = $token;
+
                 return ResponseService::successResponse('Token created.', [
-                    'token' => $token,
                     'user' => $user
                 ]);
             }

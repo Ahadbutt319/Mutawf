@@ -11,7 +11,7 @@ class SendSmsService
         $client = new \Vonage\Client($basic);
 
         $response = $client->sms()->send(
-            new \Vonage\SMS\Message\SMS("923075108200", 'BRAND_NAME', 'Your verification code is')
+            new \Vonage\SMS\Message\SMS("923075108200", config('app.name'), "Your verification code is: $code")
         );
         $message = $response->current();
         if ($message->getStatus() == 0) {

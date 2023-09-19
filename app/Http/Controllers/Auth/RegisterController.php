@@ -20,8 +20,8 @@ class RegisterController extends Controller
     {
         $rules = [
             'name' => 'required|string',
-            'email' => 'required_without:phone|email|unique:users,email',
-            'phone' => 'required_without:email|unique:users,phone',
+            'email' => 'required_without:phone|nullable|email|unique:users,email,NULL,id',
+            'phone' => 'required_without:email|nullable|unique:users,phone,NULL,id',
             'lat' => 'required',
             'lng' => 'required',
             'country' => 'required|exists:countries,name',
@@ -51,19 +51,16 @@ class RegisterController extends Controller
                 'lat' => $data['lat'],
                 'lng' => $data['lng'],
                 'country_id' => $country->id,
-                'nationality_id' => $country->id,
+                'nationality_country_id' => $country->id,
                 'role_id' => User::CUSTOMER_ROLE_ID,
                 'password' => Hash::make($data['password'])
             ]);
 
             if ( isset($data['email'])) {
                 VerificationService::sendEmailVerificationCode($user);
-            }
-
-            if ( isset($data['phone'])) {
+            } elseif ( isset($data['phone'])) {
                 VerificationService::sendPhoneVerificationCode($user);
             }
-
 
             return ResponseService::successResponse('You are registered successfully. Please verify your email.');
 

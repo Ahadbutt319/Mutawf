@@ -38,20 +38,25 @@ class ForgotPasswordController extends Controller
             if ($usernameField === 'email') {
                 $user = User::findByEmail($data['username']);
                 if (! $user) {
-                    return ResponseService::notFoundErrorResponse('No record found.');
+                    return ResponseService::successResponse('Verification code sent.');
                 }
                 
                 VerificationService::sendEmailVerificationCode($user);
-            } else {
+            } elseif ($usernameField === 'phone') {
                 $user = User::findByPhone($data['username']);
                 if (! $user) {
-                    return ResponseService::notFoundErrorResponse('No record found.');
+                    return ResponseService::successResponse('Verification code sent.');
                 }
 
                 VerificationService::sendPhoneVerificationCode($user);
+            } else {
+                return ResponseService::validationErrorResponse('Please enter a valid email or phone number.');
             }
 
-            return ResponseService::successResponse('Verification code sent.');
+            return ResponseService::successResponse("Verification code sent to your $usernameField.", [
+                'email' => $usernameField === 'email' ? true : false,
+                'phone' => $usernameField === 'phone' ? true : false,
+            ]);
         } catch (Throwable $th) {
             return ResponseService::errorResponse($th->getMessage());
         }

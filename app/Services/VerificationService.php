@@ -29,7 +29,6 @@ class VerificationService
             'phone_verification_code_expires' => now()->addMinutes(config('auth.verification.expire'))
         ]);
         event(new SendSmsEvent($user, $phoneVerificationCode));
-        // event(new VerifyUserPhone($user, $phoneVerificationCode));
     }
 
     public static function verifyEmail($email, $code)
