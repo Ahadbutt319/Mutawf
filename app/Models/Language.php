@@ -18,8 +18,10 @@ class Language extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'abbr',
         'name',
+        'name_1',
+        'abbr',
+        'direction',
     ];
 
     public function users(): HasMany
