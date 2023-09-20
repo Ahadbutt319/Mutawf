@@ -16,13 +16,13 @@ class VerificationController extends Controller
     {
         try {
             $data = $request->all();
-    
+
             $rules = [
                 'email' => 'required|email|exists:users,email'
             ];
-    
+
             $validator = Validator::make($data, $rules);
-    
+
             if ($validator->fails()) {
                 return ResponseService::validationErrorResponse($validator->errors()->first());
             }
@@ -40,13 +40,13 @@ class VerificationController extends Controller
     {
         try {
             $data = $request->all();
-    
+
             $rules = [
                 'phone' => 'required|exists:users,phone'
             ];
-    
+
             $validator = Validator::make($data, $rules);
-    
+
             if ($validator->fails()) {
                 return ResponseService::validationErrorResponse($validator->errors()->first());
             }
@@ -60,18 +60,41 @@ class VerificationController extends Controller
         }
     }
 
+
+    public function verifyPhone(Request $request){
+        {
+            try {
+                $data = $request->all();
+
+                $rules = [
+                    'phone' => 'required|exists:users,phone',
+                    'code' => 'required|min:6|max:6'
+                ];
+
+                $validator = Validator::make($data, $rules);
+
+                if ($validator->fails()) {
+                    return ResponseService::validationErrorResponse($validator->errors()->first());
+                }
+
+                return VerificationService::verifyPhone($data['phone'], $data['code']);
+            } catch (Throwable $th) {
+                return ResponseService::errorResponse($th->getMessage());
+            }
+        }
+    }
     public function verifyEmail(Request $request)
     {
         try {
             $data = $request->all();
-    
+
             $rules = [
                 'email' => 'required|email|exists:users,email',
                 'code' => 'required|min:6|max:6'
             ];
-    
+
             $validator = Validator::make($data, $rules);
-    
+
             if ($validator->fails()) {
                 return ResponseService::validationErrorResponse($validator->errors()->first());
             }

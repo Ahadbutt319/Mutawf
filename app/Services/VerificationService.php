@@ -31,6 +31,30 @@ class VerificationService
         event(new SendSmsEvent($user, $phoneVerificationCode));
     }
 
+    public static function verifyPhone($phone, $code)
+    {
+        $user = User::findByPhone($phone);
+
+        if (! $user) {
+            return ResponseService::notFoundErrorResponse('Phone number not found.');
+        }
+
+        if (! self::isPhoneVerificationCodeValid($user, $code)) {
+            return ResponseService::errorResponse('Verification code is either incorrect or expired.');
+        }
+
+        $user->update([
+            'phone_verification_code' => Null,
+            'phone_verification_code_expires' => Null,
+            'phone_verified_at' => now()
+        ]);
+
+        return ResponseService::successResponse('Number verified successfully.');
+    }
+
+
+
+
     public static function verifyEmail($email, $code)
     {
         $user = User::findByEmail($email);
