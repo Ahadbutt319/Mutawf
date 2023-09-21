@@ -34,7 +34,6 @@ Route::post('/verify-email', [VerificationController::class, 'verifyEmail']);
 Route::post('/verify-phone', [VerificationController::class, 'verifyPhone']);
 Route::get('/locals', [LanguageController::class, 'index']);
 
-
 Route::group(['middleware' => 'auth:api'], function () {
     Route::get('/auth-data', [UserController::class, 'authData']);
     Route::post('/update-profile', [UserController::class, 'updateUser']);

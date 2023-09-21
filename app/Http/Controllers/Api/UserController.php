@@ -8,12 +8,14 @@ use App\Http\Resources\UserResource;
 use App\Services\ResponseService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use Throwable;
 
 class UserController extends Controller
 {
-    public function authData () {
+    public function authData ()
+    {
       $id = auth()->user()->id;
       $user = USER::find($id);
         return ResponseService::successResponse('Here are all the user details',
