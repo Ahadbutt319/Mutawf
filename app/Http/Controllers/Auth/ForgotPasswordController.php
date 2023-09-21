@@ -54,8 +54,7 @@ class ForgotPasswordController extends Controller
             }
 
             return ResponseService::successResponse("Verification code sent to your $usernameField.", [
-                'email' => $usernameField === 'email' ? true : false,
-                'phone' => $usernameField === 'phone' ? true : false,
+                'type' => $usernameField,
             ]);
         } catch (Throwable $th) {
             return ResponseService::errorResponse($th->getMessage());

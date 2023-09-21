@@ -62,7 +62,9 @@ class RegisterController extends Controller
                 VerificationService::sendPhoneVerificationCode($user);
             }
 
-            return ResponseService::successResponse('You are registered successfully. Please verify your email.');
+            return ResponseService::successResponse('You are registered successfully. Please verify your email.', [
+                'type' => isset($data['email']) ? 'email' : 'phone',
+            ]);
 
         } catch (Throwable $th) {
             return ResponseService::errorResponse($th->getMessage());
