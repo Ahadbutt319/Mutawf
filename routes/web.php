@@ -1,5 +1,6 @@
 <?php
 
+use App\Services\ResponseService;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -12,6 +13,10 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+
+Route::get('/not-authenticated', function () {
+    return ResponseService::unauthorizedErrorResponse('Please login first.');
+})->name('not-authenticated');
 
 Route::get('/', function () {
     return view('welcome');
