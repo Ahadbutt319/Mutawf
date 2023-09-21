@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+
+use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\UserResource;
 use App\Services\ResponseService;
 use App\Http\Controllers\Controller;
