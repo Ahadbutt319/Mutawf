@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Rules\PasswordRule;
 use Illuminate\Support\Facades\Validator;
 use App\Services\ResponseService;
 use App\Services\VerificationService;
@@ -18,7 +19,7 @@ class ResetPasswordController extends Controller
         $rules = [
             'username' => 'required',
             'code' => 'required|min:6|max:6',
-            'password' => 'required|confirmed',
+            'password' => ['required', 'confirmed', new PasswordRule]
         ];
 
         return Validator::make($data, $rules);

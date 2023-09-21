@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Country;
 use App\Models\User;
+use App\Rules\PasswordRule;
 use App\Services\ResponseService;
 use App\Services\VerificationService;
 use Illuminate\Http\Request;
@@ -25,7 +26,7 @@ class RegisterController extends Controller
             'lat' => 'required',
             'lng' => 'required',
             'country' => 'required|exists:countries,name',
-            'password' => 'required|confirmed'
+            'password' => ['required', 'confirmed', new PasswordRule]
         ];
 
         return Validator::make($data, $rules);

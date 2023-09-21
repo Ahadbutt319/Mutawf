@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Rules\PasswordRule;
 use Illuminate\Http\Request;
 use App\Services\ResponseService;
 use Illuminate\Support\Facades\Auth;
@@ -15,7 +16,7 @@ class LoginController extends Controller
     {
         $rules = [
             'username' => 'required',
-            'password' => 'required'
+            'password' => ['required', new PasswordRule]
         ];
 
         return Validator::make($data, $rules);
