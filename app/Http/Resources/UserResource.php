@@ -17,14 +17,14 @@ class UserResource extends JsonResource
     {
         return [
 
-            'name' => $this->name,
-            'email' => $this->email,
-            'phone' => $this->phone,
-            'lat' => $this->lat,
-            'lng' => $this->lng,
-            'country' => $this->country->name,
-            'nationality' => $this->nationality->name,
-            'role_id' => $this->role->role,
+            'name' => $this->name ? $this->name : '',
+            'email' => $this->email ? $this->email : '',
+            'phone' => $this->phone ? $this->phone : '',
+            'lat' => $this->lat ? $this->lat : '',
+            'lng' => $this->lng ? $this->lng : '',
+            'country' => $this->country->name ? $this->country->name : '',
+            'nationality' => $this->nationality->name ? $this->nationality->name : '',
+            'role_id' => $this->role->role ? $this->role->role : '',
 
         ];
     }

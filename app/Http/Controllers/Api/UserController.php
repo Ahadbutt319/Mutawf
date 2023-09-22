@@ -17,8 +17,8 @@ class UserController extends Controller
 {
     public function authData ()
     {
-      $id = auth()->user()->id;
-      $user = USER::find($id);
+        $id = auth()->user()->id;
+        $user = User::find($id);
         return ResponseService::successResponse('Here are all the user details',
             new UserResource($user)
         );
