@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Rules\EmailRule;
 use App\Rules\PasswordRule;
 use Illuminate\Http\Request;
 use App\Services\ResponseService;
@@ -14,9 +15,13 @@ class LoginController extends Controller
 {
     protected function validateRequest($data)
     {
+        $usernameField = filter_var($data['username'], FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
+
         $rules = [
-            'username' => 'required',
-            'password' => ['required', 'confirmed', 
+            'username' => ['required', 
+                $usernameField === 'email' && config('app.env') === 'production' ? new EmailRule : null
+            ],
+            'password' => ['required',
                 config('app.env') === 'production' ? new PasswordRule : null,
             ]
         ];

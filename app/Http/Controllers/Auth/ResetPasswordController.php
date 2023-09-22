@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Rules\EmailRule;
 use App\Rules\PasswordRule;
 use Illuminate\Support\Facades\Validator;
 use App\Services\ResponseService;
@@ -16,10 +17,14 @@ class ResetPasswordController extends Controller
 {
     protected function validateRequest($data)
     {
+        $usernameField = filter_var($data['username'], FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
+
         $rules = [
-            'username' => 'required',
+            'username' => ['required', 
+                $usernameField === 'email' && config('app.env') === 'production' ? new EmailRule : null
+            ],
             'code' => 'required|min:6|max:6',
-            'password' => ['required', 'confirmed', 
+            'password' => ['required', 'confirmed',
                 config('app.env') === 'production' ? new PasswordRule : null,
             ]
         ];

@@ -6,6 +6,8 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Country;
 use App\Models\User;
+use App\Rules\EmailRule;
+use App\Rules\NameRule;
 use App\Rules\PasswordRule;
 use App\Services\ResponseService;
 use App\Services\VerificationService;
@@ -20,9 +22,13 @@ class RegisterController extends Controller
     protected function validateRequest($data)
     {
         $rules = [
-            'name' => 'required|string',
-            'email' => 'required_without:phone|nullable|email|unique:users,email,NULL,id',
-            'phone' => 'required_without:email|nullable|unique:users,phone,NULL,id',
+            'name' => ['required', 
+                config('app.env') === 'production' ? new NameRule : null,
+            ],
+            'email' => ['required_without:phone', 'nullable', 'email', 'unique:users,email,NULL,id', 
+                config('app.env') === 'production' ? new EmailRule : null,
+            ],
+            'phone' => 'required_without:email|nullable|unique:users,phone,NULL',
             'lat' => 'required',
             'lng' => 'required',
             'country' => 'required|exists:countries,name',
