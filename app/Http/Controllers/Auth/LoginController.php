@@ -16,7 +16,9 @@ class LoginController extends Controller
     {
         $rules = [
             'username' => 'required',
-            'password' => ['required', new PasswordRule]
+            'password' => ['required', 'confirmed', 
+                config('app.env') === 'production' ? new PasswordRule : null,
+            ]
         ];
 
         return Validator::make($data, $rules);

@@ -26,7 +26,9 @@ class RegisterController extends Controller
             'lat' => 'required',
             'lng' => 'required',
             'country' => 'required|exists:countries,name',
-            'password' => ['required', 'confirmed', new PasswordRule]
+            'password' => ['required', 'confirmed', 
+                config('app.env') === 'production' ? new PasswordRule : null,
+            ]
         ];
 
         return Validator::make($data, $rules);
