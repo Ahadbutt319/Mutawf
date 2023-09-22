@@ -2,23 +2,44 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Models\Company;
+use App\Services\ResponseService;
+use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-// use GoogleTranslate;
+use Throwable;
 
 class CompanyController extends Controller
 {
     public function store(Request $request)
     {
+        try{
         $rules = [
             'name' => 'required',
             'description' => 'required',
-            'type' => 'nullable|max:255',
-            'founded'
+            'type' => 'required|nullable|max:255',
+            'founded_at' => 'required|date_format:Y-m-d',
+            'is_active' =>'required',
         ];
 
-        //  Translation Example
-        // $translatedText = GoogleTranslate::translate('Hello, world!', 'en', 'es');
-        // $translatedText = GoogleTranslate::translate(['Hello, world!', 'Goodbye, world!'], 'en', 'es');
+        $data=$request->all();
+
+        $validator = Validator::make($data, $rules);
+
+        if ($validator->fails()) {
+            return ResponseService::validationErrorResponse($validator->errors()->first());
+        }
+        Company::create([
+            'name' => $data['name'],
+            'description' => $data['description'],
+            'type' => $data['type'] ?? Null,
+            'founded_at' => $data['founded_at'],
+            'is_active' => $data['is_active'],
+            'owner_id' => auth()->user()->id,
+        ]);
+        return ResponseService::successResponse('Your Company has been registered');
+    } catch (Throwable $th) {
+        return ResponseService::errorResponse($th->getMessage());
+    }
     }
 }
