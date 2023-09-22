@@ -8,6 +8,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\SendSmsController;
+use Illuminate\Bus\BusServiceProvider;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
@@ -34,12 +35,14 @@ Route::post('/verify-email', [VerificationController::class, 'verifyEmail']);
 Route::post('/verify-phone', [VerificationController::class, 'verifyPhone']);
 Route::get('/locals', [LanguageController::class, 'index']);
 
+
 Route::group(['middleware' => 'auth:api'], function () {
 
+    Route::post('/add-company', [CompanyController::class, 'store']);
     Route::post('/update-password', [UserController::class, 'updatePassword']);
     Route::get('/auth-data', [UserController::class, 'authData']);
     Route::post('/update-profile', [UserController::class, 'updateUser']);
-    Route::post('/companies', [CompanyController::class, 'store']);
+   // Route::post('/companies', [CompanyController::class, 'store']);
 
 
 });
