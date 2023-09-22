@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Hash;
+use App\Rules\PasswordRule;
 use App\Http\Resources\UserResource;
 use App\Services\ResponseService;
 use App\Http\Controllers\Controller;
@@ -59,4 +60,35 @@ class UserController extends Controller
         }
 
     }
+
+    public function updatePassword(Request $request){
+     $rules=[
+        'oldPassword' =>'required',
+        'password' => ['required', 'confirmed', new PasswordRule]
+     ];
+
+
+     $data = $request->all();
+     $validator = Validator::make($data, $rules);
+
+     if ($validator->fails()) {
+        return ResponseService::validationErrorResponse($validator->errors()->first());
+    }
+    $id=auth()->user()->id;
+    $user = User::find($id);
+    if (! $user) {
+        return ResponseService::notFoundErrorResponse('User not found');
+    }
+
+    if(Hash::check($data['oldPassword'], $user->password)) {
+         $newPass = Hash::make($data['password']);
+         $user->password=$newPass;
+         $user->save();
+         return ResponseService::successResponse('Password updated successfully');
+    }
+    else{
+        return ResponseService::notFoundErrorResponse('Old password mismatch');
+    }
+    }
+
 }
