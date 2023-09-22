@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
-
+use App\Services\VerificationService;
 use Illuminate\Support\Facades\Hash;
 use App\Rules\PasswordRule;
 use App\Http\Resources\UserResource;
@@ -53,6 +53,12 @@ class UserController extends Controller
                 'email' => $data['email'] ?? Null,
                 'phone' => $data['phone'] ?? Null,
             ]);
+
+            if ( isset($data['email'])) {
+                VerificationService::sendEmailVerificationCode($user);
+            } elseif ( isset($data['phone'])) {
+                VerificationService::sendPhoneVerificationCode($user);
+            }
 
             return ResponseService::successResponse('Profile updated successfully');
         } catch (Throwable $th) {

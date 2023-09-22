@@ -5,14 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Spatie\Translatable\HasTranslations;
 
 class Blog extends Model
 {
-    use HasFactory, HasTranslations;
+    use HasFactory;
 
     // translatable fields
-    public $translatable = ['title', 'content'];    
+    public $translatable = ['title', 'content'];
 
     /**
      * The attributes that are mass assignable.
