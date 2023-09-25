@@ -5,11 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Translatable\HasTranslations;
 
 class Group extends Model
 {
-    use HasFactory, HasTranslations;
+    use HasFactory;
 
     // translatable fields
     public $translatable = ['name', 'description'];

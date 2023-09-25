@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('services', function (Blueprint $table) {
             $table->id();
-            $table->json('service');
-            $table->json('desccription')->nullable();
+            $table->text('service');
+            $table->string('desccription')->nullable();
             $table->foreignId('serviceable_id');
             $table->string('serviceable_type');
         });

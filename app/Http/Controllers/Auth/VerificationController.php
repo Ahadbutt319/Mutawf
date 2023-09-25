@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Rules\EmailRule;
 use App\Services\ResponseService;
 use App\Services\VerificationService;
 use Illuminate\Http\Request;
@@ -18,7 +19,9 @@ class VerificationController extends Controller
             $data = $request->all();
 
             $rules = [
-                'email' => 'required|email|exists:users,email'
+                'email' => ['required', 'email', 'exists:users,email', 
+                    config('app.env') === 'production' ? new EmailRule : null,
+                ],
             ];
 
             $validator = Validator::make($data, $rules);

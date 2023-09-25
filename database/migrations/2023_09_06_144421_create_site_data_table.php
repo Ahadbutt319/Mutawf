@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->enum('type', ['file', 'text']);
             $table->string('path')->nullable();
-            $table->json('title')->nullable();
-            $table->json('content')->nullable();
+            $table->string('title')->nullable();
+            $table->text('content')->nullable();
             $table->foreignId('created_by')->constrained('users', 'id');
             $table->timestamps();
         });

@@ -6,6 +6,7 @@ use Throwable;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Rules\EmailRule;
 use App\Services\ResponseService;
 use App\Services\VerificationService;
 use Illuminate\Http\Request;
@@ -14,8 +15,12 @@ class ForgotPasswordController extends Controller
 {
     protected function validateRequest($data)
     {
+        $usernameField = filter_var($data['username'], FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
+
         $rules = [
-            'username' => 'required'
+            'username' => ['required', 
+                $usernameField === 'email' && config('app.env') === 'production' ? new EmailRule : null
+            ],
         ];
 
         return Validator::make($data, $rules);

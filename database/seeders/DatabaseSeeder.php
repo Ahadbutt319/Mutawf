@@ -20,9 +20,9 @@ class DatabaseSeeder extends Seeder
         // ]);
 
         $this->call([
-            RolesSeader::class,
+            RolesSeeder::class,
             CountriesSeeder::class,
-            LanguagesSeader::class,
+            LanguagesSeeder::class,
             CurrenciesSeader::class,
             UsersSeeder::class,
         ]);

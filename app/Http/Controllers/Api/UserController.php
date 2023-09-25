@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers\Api;
 
-
-use Illuminate\Support\Facades\Validator;
+use App\Services\VerificationService;
+use Illuminate\Support\Facades\Hash;
+use App\Rules\PasswordRule;
 use App\Http\Resources\UserResource;
 use App\Services\ResponseService;
 use App\Http\Controllers\Controller;
@@ -16,8 +17,8 @@ class UserController extends Controller
 {
     public function authData ()
     {
-      $id = auth()->user()->id;
-      $user = USER::find($id);
+        $id = auth()->user()->id;
+        $user = User::find($id);
         return ResponseService::successResponse('Here are all the user details',
             new UserResource($user)
         );
@@ -53,10 +54,47 @@ class UserController extends Controller
                 'phone' => $data['phone'] ?? Null,
             ]);
 
+            if ( isset($data['email'])) {
+                VerificationService::sendEmailVerificationCode($user);
+            } elseif ( isset($data['phone'])) {
+                VerificationService::sendPhoneVerificationCode($user);
+            }
+
             return ResponseService::successResponse('Profile updated successfully');
         } catch (Throwable $th) {
             return ResponseService::errorResponse($th->getMessage());
         }
 
     }
+
+    public function updatePassword(Request $request){
+     $rules=[
+        'oldPassword' =>'required',
+        'password' => ['required', 'confirmed', new PasswordRule]
+     ];
+
+
+     $data = $request->all();
+     $validator = Validator::make($data, $rules);
+
+     if ($validator->fails()) {
+        return ResponseService::validationErrorResponse($validator->errors()->first());
+    }
+    $id=auth()->user()->id;
+    $user = User::find($id);
+    if (! $user) {
+        return ResponseService::notFoundErrorResponse('User not found');
+    }
+
+    if(Hash::check($data['oldPassword'], $user->password)) {
+         $newPass = Hash::make($data['password']);
+         $user->password=$newPass;
+         $user->save();
+         return ResponseService::successResponse('Password updated successfully');
+    }
+    else{
+        return ResponseService::notFoundErrorResponse('Old password mismatch');
+    }
+    }
+
 }

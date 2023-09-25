@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('companies', function (Blueprint $table) {
             $table->id();
-            $table->json('name');
-            $table->json('description');
+            $table->string('name');
+            $table->text('description');
             $table->string('type')->nullable();
             $table->date('founded_at')->nullable();
             $table->foreignId('owner_id')->constrained('users');
