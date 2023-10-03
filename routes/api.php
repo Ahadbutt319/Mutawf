@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\FlightController;
 use App\Http\Controllers\Api\CompanyController;
 use App\Http\Controllers\Api\LanguageController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
@@ -23,6 +24,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+route::post('/search-airports',[FlightController::class, 'getAirports']);
+
 Route::group(['middleware' => ['local']], function () {
 
     Route::post('/register', [RegisterController::class, 'register']);
@@ -35,14 +38,14 @@ Route::group(['middleware' => ['local']], function () {
     Route::post('/verify-phone', [VerificationController::class, 'verifyPhone']);
     Route::get('/locals', [LanguageController::class, 'index']);
     Route::post('locals', [LanguageController::class, 'changeLocale']);
-    
+
     Route::group(['middleware' => ['auth:api', 'last_seen']], function () {
-    
+
         Route::post('/update-password', [UserController::class, 'updatePassword']);
         Route::get('/auth-data', [UserController::class, 'authData']);
         Route::post('/update-profile', [UserController::class, 'updateUser']);
         Route::post('/companies', [CompanyController::class, 'store']);
-    
+
     });
 });
 
