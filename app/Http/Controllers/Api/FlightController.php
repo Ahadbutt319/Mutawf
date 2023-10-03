@@ -29,7 +29,6 @@ return $response;
             'country' =>'required',
          ];
 
-
          $data = $request->all();
         $validator = Validator::make($data, $rules);
 
@@ -47,5 +46,50 @@ return $response;
         ] ,
     ]);
         echo $response->getBody();
+    }
+
+
+    public function getFilter(Request $request){
+        $client = new \GuzzleHttp\Client();
+        // Get the dynamic parameters from the request
+
+        $rules=[
+            'sourceAirportCode' =>'required',
+            'destinationAirportCode' =>'required',
+            'date' =>'required | Date',
+            'itineraryType' =>'required',
+            'classOfService' =>'required'
+              ];
+
+         $data = $request->all();
+        $validator = Validator::make($data, $rules);
+
+        if ($validator->fails()) {
+            return ResponseService::validationErrorResponse($validator->errors()->first());
+        }
+
+        $sourceAirportCode = $request->input('sourceAirportCode');
+        $destinationAirportCode = $request->input('destinationAirportCode');
+        $date = $request->input('date');
+        $itineraryType = $request->input('itineraryType');
+        $classOfService = $request->input('classOfService');
+        $client = new \GuzzleHttp\Client();
+
+// Construct the URL with the dynamic parameters
+    $url = "https://tripadvisor16.p.rapidapi.com/api/v1/flights/getFilters?" .
+    "sourceAirportCode=$sourceAirportCode&" .
+    "destinationAirportCode=$destinationAirportCode&" .
+    "date=$date&" .
+    "itineraryType=$itineraryType&" .
+    "classOfService=$classOfService";
+
+    $response = $client->request('GET', $url, [
+    'headers' => [
+        'X-RapidAPI-Host' => 'tripadvisor16.p.rapidapi.com',
+        'X-RapidAPI-Key' => '1f73cff242msh0f5b618317565cap1d394fjsnf1a4d8234f55',
+    ],
+]);
+
+echo $response->getBody();
     }
 }
