@@ -23,7 +23,9 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-route::post('/searchFilter',[FlightController::class, 'getFilter']);
+
+route::post('/search-Flight',[FlightController::class, 'getFlights']);
+route::post('/search-Filter',[FlightController::class, 'getFilter']);
 route::post('/search-airports',[FlightController::class, 'getAirports']);
 
 Route::group(['middleware' => ['local']], function () {
