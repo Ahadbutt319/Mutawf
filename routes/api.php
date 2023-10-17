@@ -13,6 +13,8 @@ use Illuminate\Bus\BusServiceProvider;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\HotelController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -24,9 +26,19 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+
+
+route::post('/search-location',[HotelController::class, 'searchLocation']);
+route::post('/search-Hotel',[HotelController::class, 'getGeoId']);
+route::post('/get-hotel',[HotelController::class, 'getHotelDetails']);
+
+
 route::post('/search-Flight',[FlightController::class, 'getFlights']);
 route::post('/search-Filter',[FlightController::class, 'getFilter']);
 route::post('/search-airports',[FlightController::class, 'getAirports']);
+
+
+
 
 Route::group(['middleware' => ['local']], function () {
 
@@ -43,6 +55,7 @@ Route::group(['middleware' => ['local']], function () {
 
     Route::group(['middleware' => ['auth:api', 'last_seen']], function () {
 
+        Route::get('/verification-status', [UserController::class, 'getVerificationStatus']);
         Route::post('/update-password', [UserController::class, 'updatePassword']);
         Route::get('/auth-data', [UserController::class, 'authData']);
         Route::post('/update-profile', [UserController::class, 'updateUser']);
