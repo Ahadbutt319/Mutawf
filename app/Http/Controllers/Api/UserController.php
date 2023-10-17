@@ -96,5 +96,16 @@ class UserController extends Controller
         return ResponseService::notFoundErrorResponse('Old password mismatch');
     }
     }
-
+     public function getVerificationStatus(){
+      $userStatus=auth()->user()->email_verified_at;
+      try{
+      if($userStatus)
+      return ResponseService::successResponse('You are Verified!');
+    else
+    return ResponseService::notFoundErrorResponse('Please verify your email and phone number');
+    }
+      catch (Throwable $th) {
+        return ResponseService::errorResponse($th->getMessage());
+      }
+   }
 }
