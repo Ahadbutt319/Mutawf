@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\HotelController;
+use App\Http\Controllers\Api\AgentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,6 +26,8 @@ use App\Http\Controllers\Api\HotelController;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+
+
 
 
 
@@ -54,6 +57,10 @@ Route::group(['middleware' => ['local']], function () {
     Route::post('locals', [LanguageController::class, 'changeLocale']);
 
     Route::group(['middleware' => ['auth:api', 'last_seen']], function () {
+
+
+route::post('/create-package',[AgentController::class,'addPackage']);
+route::post('/get-package',[AgentController::class,'getPackages']);
 
         Route::get('/verification-status', [UserController::class, 'getVerificationStatus']);
         Route::post('/update-password', [UserController::class, 'updatePassword']);

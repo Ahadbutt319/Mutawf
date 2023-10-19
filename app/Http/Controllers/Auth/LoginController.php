@@ -18,7 +18,7 @@ class LoginController extends Controller
         $usernameField = filter_var($data['username'], FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
 
         $rules = [
-            'username' => ['required', 
+            'username' => ['required',
                 $usernameField === 'email' && config('app.env') === 'production' ? new EmailRule : null
             ],
             'password' => ['required',
@@ -58,7 +58,7 @@ class LoginController extends Controller
                             return ResponseService::unauthorizedErrorResponse("Please verify your $usernameField first");
                         }
                     }
-    
+
                     if ($usernameField == 'phone') {
                         if ($user->phone_verified_at == Null) {
                             Auth::logout();
