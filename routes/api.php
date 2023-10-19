@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\HotelController;
+use App\Http\Controllers\Api\AgentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,6 +27,10 @@ use App\Http\Controllers\Api\HotelController;
 |
 */
 
+
+
+
+route::post('/add-package',[AgentController::class,'addPackage']);
 
 
 route::post('/search-location',[HotelController::class, 'searchLocation']);

@@ -22,17 +22,17 @@ class RegisterController extends Controller
     protected function validateRequest($data)
     {
         $rules = [
-            'name' => ['required', 
+            'name' => ['required',
                 config('app.env') === 'production' ? new NameRule : null,
             ],
-            'email' => ['required_without:phone', 'nullable', 'email', 'unique:users,email,NULL,id', 
+            'email' => ['required_without:phone', 'nullable', 'email', 'unique:users,email,NULL,id',
                 config('app.env') === 'production' ? new EmailRule : null,
             ],
             'phone' => 'required_without:email|nullable|unique:users,phone,NULL',
             'lat' => 'required',
             'lng' => 'required',
             'country' => 'required|exists:countries,name',
-            'password' => ['required', 'confirmed', 
+            'password' => ['required', 'confirmed',
                 config('app.env') === 'production' ? new PasswordRule : null,
             ]
         ];
@@ -79,4 +79,7 @@ class RegisterController extends Controller
             return ResponseService::errorResponse($th->getMessage());
         }
     }
+
+
+
 }
