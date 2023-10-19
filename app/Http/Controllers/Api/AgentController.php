@@ -40,7 +40,7 @@ class AgentController extends Controller
             'Additional_Notes' => $data['Additional_Notes'] ?? null,
             'Travel' => $data['Travel'],
             'Managed_by' => $data['Managed_by'],
-            'Added_by'=>6
+            'Added_by'=>auth()->user()->id
         ]);
 
           $images=$request->file('image');
