@@ -30,8 +30,6 @@ use App\Http\Controllers\Api\AgentController;
 
 
 
-route::post('/add-package',[AgentController::class,'addPackage']);
-
 
 route::post('/search-location',[HotelController::class, 'searchLocation']);
 route::post('/search-Hotel',[HotelController::class, 'getGeoId']);
@@ -59,6 +57,10 @@ Route::group(['middleware' => ['local']], function () {
     Route::post('locals', [LanguageController::class, 'changeLocale']);
 
     Route::group(['middleware' => ['auth:api', 'last_seen']], function () {
+
+
+route::post('/create-package',[AgentController::class,'addPackage']);
+route::post('/get-package',[AgentController::class,'getPackages']);
 
         Route::get('/verification-status', [UserController::class, 'getVerificationStatus']);
         Route::post('/update-password', [UserController::class, 'updatePassword']);
