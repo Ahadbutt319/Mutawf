@@ -58,10 +58,11 @@ Route::group(['middleware' => ['local']], function () {
 
     Route::group(['middleware' => ['auth:api', 'last_seen']], function () {
 
-
-route::post('/create-package',[AgentController::class,'addPackage']);
-route::post('/get-package',[AgentController::class,'getPackages']);
-route::post('/add-hotels',[AgentController::class,'addHotel']);
+        route::get('/get-operators',[AgentController::class,'getOperators']);
+        route::post('/become-operator',[AgentController::class,'becomeAnOperator']);
+        route::post('/create-package',[AgentController::class,'addPackage']);
+        route::get('/get-package',[AgentController::class,'getPackages']);
+        route::post('/add-hotels',[AgentController::class,'addHotel']);
 
         Route::get('/verification-status', [UserController::class, 'getVerificationStatus']);
         Route::post('/update-password', [UserController::class, 'updatePassword']);

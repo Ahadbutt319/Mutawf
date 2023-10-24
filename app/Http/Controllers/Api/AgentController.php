@@ -1,6 +1,9 @@
 <?php
 
 namespace App\Http\Controllers\api;
+
+use App\Models\Operator;
+use App\Models\RoomBooking;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -15,6 +18,54 @@ class AgentController extends Controller
     public function getProfile(){}
 
 
+    public function getOperators(){
+        return Operator::All();
+    }
+    public function becomeAnOperator(Request $request){
+        $data=$request->all();
+            $rules = [
+                'name' => 'required|string',
+                'phone' => 'required|string',
+                'email' => 'required|email',
+                'clearance_area' => 'required|string',
+                'availability' => 'required|string',
+                'type' => 'required|string',
+                'user_id' => 'required|integer', // Assuming it's an integer
+                'images' => 'required|array|string',
+            ];
+
+            // Create a validator instance
+            $validation = Validator::make($data, $rules);
+
+            if($validation->fails())
+            {
+            return ResponseService::validationErrorResponse($validation->errors()->first());
+            }
+            else{
+                $operator = Operator::create([
+                    'name' => $data['name'],
+                    'phone' => $data['phone'],
+                    'email' => $data['email'],
+                    'clearance_area' => $data['clearance_area'],
+                    'availability' => $data['availability'],
+                    'type' => $data['type'],
+                    'user_id' => auth()->user()->id,
+                ]);
+                $images=$request->file('images');
+                foreach ($images as $image) {
+                    if ($image->isValid()) {
+                        $imageName = time() . '_' . $image->getClientOriginalName();
+                        $image->move(storage_path('app/public/images'), $imageName);
+
+                        $agentImage = new AgentImages();
+                        $agentImage->Package_id	 = $operator->id;
+                        $agentImage->category_id = 4;
+                        $agentImage->image = 'agent_images/' . $imageName;
+                        $agentImage->save();
+                    }
+                }
+        }
+    }
     public function addHotel(Request $request){
         $data=$request->all();
         $validation=validator::make($data,[
@@ -73,11 +124,11 @@ class AgentController extends Controller
 
             }
         }
-;
-            for ($i = 0; $i < count($rooms); $i++) {
-            $room = new RoomCategory();
-            $room->category_name = $request->room_categories[$i];
-            $room->hotel_id = $agentHotel->id;
+        for ($i = 0; $i < count($rooms); $i++) {
+            $room = new RoomBooking();
+            $room->room_hotel_id = $agentHotel->id;
+            $id=RoomCategory::where('name',$rooms[$i])->pluck('id')->first();
+            $room->room_category_id = $id;
             $room->added_by = auth()->user()->id;
             $room->save();
             }

@@ -11,11 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('room_categories', function (Blueprint $table) {
+        Schema::create('operators', function (Blueprint $table) {
             $table->id();
-            $table->string('Category Name');
-            $table->foreignId('added_by')->references('id')->on('users')->onDelete('cascade');
-            $table->foreignId('hotel_id')->references('id')->on('agent_hotels')->onDelete('cascade');
+            $table->string('name');
+            $table->string('phone');
+            $table->string('email');
+            $table->string('clearance_area');
+            $table->string('availability');
+            $table->string('type');
+            $table->foreignId('user_id')->references('id')->on('users');
             $table->timestamps();
         });
     }
@@ -25,7 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('room_categories');
-
+        Schema::dropIfExists('operators');
     }
 };
