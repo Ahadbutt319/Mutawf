@@ -184,14 +184,13 @@ class AgentController extends Controller
                     $agentImage->save();
                 }
             }
-            return ResponseService::successResponse('You Package is Added Successfully !');
+            return ResponseService::successResponse('You Package is Added Successfully !',$agentPackage);
          }
     }
 
     public function getPackages()
     {
-         $myPackages=AgentPackage::where('added_by',auth()->user()->id)->get();
-         return $myPackages;
+        return AgentPackage::with('getImages')->get();
     }
 
 }

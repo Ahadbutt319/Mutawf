@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\AgentImages;
+
 
 class AgentPackage extends Model
 {
@@ -18,4 +20,8 @@ class AgentPackage extends Model
         'Managed_by',
         'Added_by'
     ];
+
+    public function getImages(){
+        return $this->hasMany(AgentImages::class,'Package_id')->where('category_id',2);
+    }
 }
