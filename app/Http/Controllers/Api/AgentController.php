@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\api;
 
+use App\Models\ImageCategory;
 use App\Models\Agents;
 use App\Models\Operator;
 use App\Models\PackageKey;
@@ -21,10 +22,43 @@ class AgentController extends Controller
 {
     public function getProfile(){}
 
-    public function getOperators(){
-        return Operator::All();
+
+    public function addImageCategory(Request $request){
+        $data=$request->all();
+        $rules = [
+            'image_type' => 'required|string',
+        ];
+
+        // Create a validator instance
+        $validation = Validator::make($data, $rules);
+        if($validation->fails())
+        {
+        return ResponseService::validationErrorResponse($validation->errors()->first());
+        }
+        else{
+            ImageCategory::create([
+            'image_type'=>$data["image_type"],
+            ]);
+            return ResponseService::successResponse('Your Category Added' );
+        }
+    }
+    public function fetchOperators(){
+        return response()->json([
+            'code'=>200,
+            'message'=>'Operators fetched successfully',
+            'hotels' =>Operator::select('id','phone', 'email', 'name')->get()
+        ], 200);
     }
     public function becomeAnOperator(Request $request){
+
+
+        $existsInOperators = Operator::where('user_id', auth()->user()->id)->exists();
+
+        if ($existsInOperators) {
+        return ResponseService::successResponse('You are already an operator!',$existsInOperators);
+        }
+
+
         $data=$request->all();
             $rules = [
                 'name' => 'required|string',
@@ -33,8 +67,7 @@ class AgentController extends Controller
                 'clearance_area' => 'required|string',
                 'availability' => 'required|string',
                 'type' => 'required|string',
-                'user_id' => 'required|integer', // Assuming it's an integer
-                'images' => 'required|array|string',
+                'images' => 'required|array|min:1|max:2',
             ];
 
             // Create a validator instance
@@ -45,6 +78,7 @@ class AgentController extends Controller
             return ResponseService::validationErrorResponse($validation->errors()->first());
             }
             else{
+
                 $operator = Operator::create([
                     'name' => $data['name'],
                     'phone' => $data['phone'],
@@ -55,18 +89,23 @@ class AgentController extends Controller
                     'user_id' => auth()->user()->id,
                 ]);
                 $images=$request->file('images');
+                $category=ImageCategory::where('image_type','Operator')->pluck('id')->first();
                 foreach ($images as $image) {
                     if ($image->isValid()) {
-                        $imageName = time() . '_' . $image->getClientOriginalName();
-                        $image->move(storage_path('app/public/images'), $imageName);
+                        $imagePath = $image->store('public/images'); // Store the image file
+
+                        $imageUrl = asset(str_replace('public', 'storage', $imagePath)); // Generate the image URL
+
 
                         $agentImage = new AgentImage();
-                        $agentImage->Package_id	 = $operator->id;
-                        $agentImage->category_id = 4;
-                        $agentImage->image = 'agent_images/' . $imageName;
+                        $agentImage->type_id= $operator->id;
+                        $agentImage->category_id= $category;
+                        $agentImage->image =$imageUrl;
                         $agentImage->save();
                     }
                 }
+                return ResponseService::successResponse('You are an operator now!',$operator );
+
         }
     }
     public function addHotel(Request $request){
