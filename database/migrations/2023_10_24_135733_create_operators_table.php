@@ -11,11 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('agent_images', function (Blueprint $table) {
+        Schema::create('operators', function (Blueprint $table) {
             $table->id();
-            $table->string('image');
-            $table->unsignedBigInteger('Package_id');
-            $table->foreign('Package_id')->references('id')->on('agent_packages');
+            $table->string('name');
+            $table->string('phone');
+            $table->string('email');
+            $table->string('clearance_area');
+            $table->string('availability');
+            $table->string('type');
+            $table->foreignId('user_id')->constrained('users')->nullable;
             $table->timestamps();
         });
     }
@@ -25,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('agent_images');
+        Schema::dropIfExists('operators');
     }
 };

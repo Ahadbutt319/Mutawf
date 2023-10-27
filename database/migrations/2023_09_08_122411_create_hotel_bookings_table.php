@@ -21,7 +21,7 @@ return new class extends Migration
             $table->timestamp('checkout_date_time')->nullable();
             $table->enum('status', ['pending', 'confirmed', 'in_progress', 'cancelled']);
             $table->enum('checkin_status', ['pending', 'checked in', 'no show']);
-            $table->enum('checkout_status', ['pending', 'checked in', 'no show']);
+             $table->enum('checkout_status', ['pending', 'checked in', 'no show']);
             $table->text('description')->nullable();
             $table->timestamps();
         });

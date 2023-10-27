@@ -11,16 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('agent_packages', function (Blueprint $table) {
+        Schema::create('agent_hotels', function (Blueprint $table) {
             $table->id();
-            $table->string('package_name');
-            $table->string('duration');
-            $table->string('visa')->nullable();
+            $table->string('hotel_name');
+            $table->string('private_transport');
+            $table->string('location');
             $table->text('details');
-            $table->text('additional_notes')->nullable();
-            $table->string('travel')->nullable();
-            $table->string('managed_by');
-            $table->string('hotel')->nullable();
             $table->foreignId('added_by')->constrained('users')->nullable;
             $table->timestamps();
         });
@@ -31,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('agent_packages');
+        Schema::dropIfExists('agent_hotels');
     }
 };

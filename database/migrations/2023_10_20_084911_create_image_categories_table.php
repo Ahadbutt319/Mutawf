@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('agents', function (Blueprint $table) {
+        Schema::create('image_categories', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('agent_id')->constrained('users')->nullable;
+            $table->string('image_type');
             $table->timestamps();
         });
     }
@@ -23,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('agents');
+        Schema::dropIfExists('image_categories');
     }
 };

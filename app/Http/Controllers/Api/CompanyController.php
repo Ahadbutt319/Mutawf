@@ -29,7 +29,7 @@ class CompanyController extends Controller
         if ($validator->fails()) {
             return ResponseService::validationErrorResponse($validator->errors()->first());
         }
-        Company::create([
+        $company=Company::create([
             'name' => $data['name'],
             'description' => $data['description'],
             'type' => $data['type'] ?? Null,
@@ -37,7 +37,7 @@ class CompanyController extends Controller
             'is_active' => $data['is_active'],
             'owner_id' => auth()->user()->id,
         ]);
-        return ResponseService::successResponse('Your Company has been registered');
+        return ResponseService::successResponse('Your Company has been registered',$company);
     } catch (Throwable $th) {
         return ResponseService::errorResponse($th->getMessage());
     }

@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('agents', function (Blueprint $table) {
+        Schema::create('room_bookings', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('agent_id')->constrained('users')->nullable;
+            $table->string('added_by');
+            $table->foreignId('room_category_id')->references('id')->on('room_categories');
+            $table->foreignId('room_hotel_id')->references('id')->on('agent_hotels');
             $table->timestamps();
         });
     }
@@ -23,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('agents');
+        Schema::dropIfExists('room_bookings');
     }
 };
