@@ -5,8 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class AgentImages extends Model
+class AgentImage extends Model
 {
     use HasFactory;
-    protected $fillable = ['image','package_id','category_id'];
+    protected $fillable = ['image','type_id','category_id'];
+
 }

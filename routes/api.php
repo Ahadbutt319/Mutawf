@@ -61,8 +61,11 @@ Route::group(['middleware' => ['local']], function () {
         route::get('/get-operators',[AgentController::class,'getOperators']);
         route::post('/become-operator',[AgentController::class,'becomeAnOperator']);
         route::post('/create-package',[AgentController::class,'addPackage']);
-        route::get('/get-package',[AgentController::class,'getPackages']);
+        route::get('/get-packages',[AgentController::class,'getGeneralPackage']);
         route::post('/add-hotels',[AgentController::class,'addHotel']);
+        route::get('/get-hotels',[AgentController::class,'getHotels']);
+
+
 
         Route::get('/verification-status', [UserController::class, 'getVerificationStatus']);
         Route::post('/update-password', [UserController::class, 'updatePassword']);

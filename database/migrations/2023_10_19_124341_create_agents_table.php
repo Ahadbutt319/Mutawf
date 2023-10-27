@@ -13,8 +13,7 @@ return new class extends Migration
     {
         Schema::create('agents', function (Blueprint $table) {
             $table->id();
-          $table->unsignedBigInteger('agent_id');
-          $table->foreign('agent_id')->references('id')->on('users');
+            $table->foreignId('agent_id')->constrained('users')->nullable;
             $table->timestamps();
         });
     }

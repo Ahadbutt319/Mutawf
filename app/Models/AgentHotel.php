@@ -11,8 +11,11 @@ class AgentHotel extends Model
    protected $fillable = [
     'hotel_name',
     'private_transport',
-    'Location',
-    'Details',
+    'location',
+    'details',
     'added_by',
    ];
+   public function getImages(){
+    return $this->hasMany(AgentImage::class,'type_id')->where('category_id',2);
+}
 }

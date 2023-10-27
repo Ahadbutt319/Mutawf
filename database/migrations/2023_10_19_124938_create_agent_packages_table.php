@@ -13,16 +13,15 @@ return new class extends Migration
     {
         Schema::create('agent_packages', function (Blueprint $table) {
             $table->id();
-            $table->string('Package_Name');
-            $table->string('Duration');
-            $table->string('Visa');
-            $table->text('Details');
-            $table->text('Additional_Notes')->nullable();
-            $table->string('Travel');
-            $table->string('Managed_by');
-            $table->string('Images');
-            $table->unsignedBigInteger('Added_by');
-            $table->foreign('Added_by')->references('id')->on('users');
+            $table->string('package_name');
+            $table->string('duration');
+            $table->string('visa')->nullable();
+            $table->text('details');
+            $table->text('additional_notes')->nullable();
+            $table->string('travel')->nullable();
+            $table->string('managed_by');
+            $table->string('hotel')->nullable();
+            $table->foreignId('added_by')->constrained('users')->nullable;
             $table->timestamps();
         });
     }

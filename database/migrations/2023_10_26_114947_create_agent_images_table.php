@@ -11,9 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('agent_images', function (Blueprint $table) {
-            $table->unsignedBigInteger('category_id');
-            $table->foreign('category_id')->references('id')->on('image_categories')->onDelete('cascade');
+        Schema::create('agent_images', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('category_id')->constrained('image_categories')->nullable;
+            $table->string('type_id');
+            $table->string('image');
+            $table->timestamps();
         });
     }
 
@@ -22,8 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('agent_images', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('agent_images');
     }
 };

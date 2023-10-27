@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('clearance_area');
             $table->string('availability');
             $table->string('type');
-            $table->foreignId('user_id')->references('id')->on('users');
+            $table->foreignId('user_id')->constrained('users')->nullable;
             $table->timestamps();
         });
     }

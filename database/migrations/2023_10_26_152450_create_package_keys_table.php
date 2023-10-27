@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('agent_images', function (Blueprint $table) {
+        Schema::create('package_keys', function (Blueprint $table) {
             $table->id();
-            $table->string('image');
-            $table->unsignedBigInteger('Package_id');
-            $table->foreign('Package_id')->references('id')->on('agent_packages');
+            $table->boolean('hotel')->default(false);
+            $table->boolean('visa')->default(false);
+            $table->boolean('travel')->default(false);
+            $table->foreignId('package')->constrained('agent_packages')->nullable;
             $table->timestamps();
         });
     }
@@ -25,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('agent_images');
+        Schema::dropIfExists('package_keys');
     }
 };

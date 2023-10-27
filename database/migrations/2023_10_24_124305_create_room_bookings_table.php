@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('room_bookings', function (Blueprint $table) {
             $table->id();
+            $table->string('added_by');
             $table->foreignId('room_category_id')->references('id')->on('room_categories');
             $table->foreignId('room_hotel_id')->references('id')->on('agent_hotels');
             $table->timestamps();
