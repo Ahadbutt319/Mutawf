@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\UserCardController;
 use App\Http\Controllers\Api\FlightController;
 use App\Http\Controllers\Api\CompanyController;
 use App\Http\Controllers\Api\LanguageController;
@@ -67,6 +68,9 @@ Route::group(['middleware' => ['local']], function () {
         route::post('/add-ImageCategory',[AgentController::class,'addImageCategory']);
         route::post('/become-operator',[AgentController::class,'becomeAnOperator']);
         route::get('/fetch-operators',[AgentController::class,'fetchOperators']);
+
+        route::post('/add-cards',[UserCardController::class,'create']);
+        route::post('/add-usercards',[UserCardController::class,'store']);
 
 
 
