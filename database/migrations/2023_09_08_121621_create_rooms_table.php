@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('rooms', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('hotel_id')->constrained('hotels');
             $table->string('reference_number')->unique();
             $table->string('type')->nullable();
             $table->json('description')->nullable();
