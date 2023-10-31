@@ -28,7 +28,9 @@ class UserCardController extends Controller
     {
         $data=$request->all();
         $rules = [
-            'card_type'=>'required|string'
+            'card_type'=>'required|string',
+            'expiry'=>'required|date',
+            'card_digits'=>'required|min:4|max:4'
         ];
 
         // Create a validator instance
@@ -40,15 +42,26 @@ class UserCardController extends Controller
         }
         else{
 
-            $card=Card::create([
+            $card=UserCard::create([
             'card_type'=>$data["card_type"],
+            'expiry'=>$data['expiry'],
+            'code'=>$data['card_digits'],
+            'user_id'=>auth()->user()->id
             ]);
-            return ResponseService::successResponse('Card created successfully',$card);
+            return ResponseService::successResponse('Card added successfully',$card);
 
         }
 
     }
 
+
+    public function showCards(){
+        return response()->json([
+            'code'=>200,
+            'message'=>'Cards fetched successfully',
+            'cards' =>UserCard::select('card_type','code', 'expiry')->get()
+        ], 200);
+    }
     /**
      * Store a newly created resource in storage.
      */
