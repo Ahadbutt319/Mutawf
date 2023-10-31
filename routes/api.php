@@ -75,6 +75,8 @@ Route::group(['middleware' => ['local']], function () {
 
 
         route::post('/add-card',[UserCardController::class,'create']);
+        route::post('/remove-card',[UserCardController::class,'remove']);
+
         route::get('/cards',[UserCardController::class,'showCards']);
 
 
