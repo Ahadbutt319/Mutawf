@@ -69,11 +69,14 @@ Route::group(['middleware' => ['local']], function () {
         route::post('/become-operator',[AgentController::class,'becomeAnOperator']);
         route::get('/operators',[AgentController::class,'fetchOperators']);
         route::post('/delpacks',[AgentController::class,'removePackages']);
+        route::post('/add-transportation',[AgentController::class,'addTransportation']);
 
       
 
 
         route::post('/add-card',[UserCardController::class,'create']);
+        route::post('/remove-card',[UserCardController::class,'remove']);
+
         route::get('/cards',[UserCardController::class,'showCards']);
 
 

@@ -21,6 +21,28 @@ class UserCardController extends Controller
         //
     }
 
+
+    public function  remove(Request $request){
+        $data=$request->all();
+        $rules = [
+            'id'=>'required|exists:user_cards,id'
+        ];
+
+        // Create a validator instance
+        $validation = Validator::make($data, $rules);
+
+        if($validation->fails())
+        {
+        return ResponseService::validationErrorResponse($validation->errors()->first());
+        }
+        else{
+            UserCard::where('id',$data['id'])->delete();
+            return response()->json([
+                'code'=>200,
+                'message'=>'Card deleted successfully',
+            ], 200);
+        }
+    }
     /**
      * Show the form for creating a new resource.
      */
