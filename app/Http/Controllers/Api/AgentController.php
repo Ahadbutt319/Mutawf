@@ -23,6 +23,15 @@ class AgentController extends Controller
     public function getProfile(){}
 
 
+    public function removePackages(Request $request){
+        $data=$request->all();
+        AgentImage::where("type_id",$data["id"])->where('category_id',1)->delete();
+        PackageKey::where("package",$data["id"])->delete();
+        AgentPackage::where("id",$data["id"])->delete();
+        return ResponseService::successResponse('Package deleted ' );
+
+    }
+
     public function addImageCategory(Request $request){
         $data=$request->all();
         $rules = [
@@ -46,7 +55,7 @@ class AgentController extends Controller
         return response()->json([
             'code'=>200,
             'message'=>'Operators fetched successfully',
-            'hotels' =>Operator::select('id','phone', 'email', 'name')->get()
+            'operators' =>Operator::select('id','phone', 'email', 'name')->get()
         ], 200);
     }
     public function becomeAnOperator(Request $request){
@@ -250,8 +259,8 @@ class AgentController extends Controller
     {
         return response()->json([
             'code'=>200,
-            'message'=>'Hotels fetched successfully',
-            'hotels' =>  AgentPackage::with('Keys')->with('Images')->get()
+            'message'=>'Packages fetched successfully',
+            'packages' =>  AgentPackage::with('Keys')->with('Images')->get()
         ], 200);
     }
 

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\UserCardController;
 use App\Http\Controllers\Api\FlightController;
 use App\Http\Controllers\Api\CompanyController;
 use App\Http\Controllers\Api\LanguageController;
@@ -61,12 +62,19 @@ Route::group(['middleware' => ['local']], function () {
         route::get('/get-operators',[AgentController::class,'getOperators']);
         route::post('/become-operator',[AgentController::class,'becomeAnOperator']);
         route::post('/create-package',[AgentController::class,'addPackage']);
-        route::get('/get-packages',[AgentController::class,'getGeneralPackage']);
+        route::get('/packages',[AgentController::class,'getGeneralPackage']);
         route::post('/add-hotels',[AgentController::class,'addHotel']);
         route::get('/get-hotels',[AgentController::class,'getHotels']);
         route::post('/add-ImageCategory',[AgentController::class,'addImageCategory']);
         route::post('/become-operator',[AgentController::class,'becomeAnOperator']);
-        route::get('/fetch-operators',[AgentController::class,'fetchOperators']);
+        route::get('/operators',[AgentController::class,'fetchOperators']);
+        route::post('/delpacks',[AgentController::class,'removePackages']);
+
+      
+
+
+        route::post('/add-card',[UserCardController::class,'create']);
+        route::get('/cards',[UserCardController::class,'showCards']);
 
 
 
