@@ -69,6 +69,7 @@ Route::group(['middleware' => ['local']], function () {
         route::post('/become-operator',[AgentController::class,'becomeAnOperator']);
         route::get('/operators',[AgentController::class,'fetchOperators']);
         route::post('/delpacks',[AgentController::class,'removePackages']);
+        route::post('/add-transportation',[AgentController::class,'addTransportation']);
 
       
 

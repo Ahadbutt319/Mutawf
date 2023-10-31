@@ -2,25 +2,85 @@
 
 namespace App\Http\Controllers\api;
 
-use App\Models\ImageCategory;
+use App\Models\Room;
+use App\Models\User;
 use App\Models\Agents;
 use App\Models\Operator;
+use App\Models\AgentHotel;
+use App\Models\AgentImage;
 use App\Models\PackageKey;
 use App\Models\RoomBooking;
-use Illuminate\Support\Facades\Validator;
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Services\ResponseService;
-use App\Models\AgentImage;
-use App\Models\AgentHotel;
-use App\Models\Room;
 use App\Models\AgentPackage;
 use App\Models\RoomCategory;
-use App\Models\User;
+use Illuminate\Http\Request;
+use App\Models\ImageCategory;
+use App\Services\ResponseService;
+use App\Models\AgentTransportation;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Validator;
 
 class AgentController extends Controller
 {
     public function getProfile(){}
+
+
+public function addTransportation(Request $request){
+    $data = $request->all();
+
+$rules = [
+    'type' => 'required|string',
+    'availability' => 'required|string',
+    'location' => 'required|string',
+    'pickup' => 'required|string',
+    'no_of_persons' => 'required|integer',
+    'manage_by' => 'required|string',
+    'tags' => 'required|string',
+    'image' => 'required|array|min:1',
+    'image.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // Adjus
+];
+
+// Create a validator instance
+$validation = Validator::make($data, $rules);
+
+if ($validation->fails()) {
+    return ResponseService::validationErrorResponse($validation->errors()->first());
+} else {
+    $agentTransportation = AgentTransportation::create([
+        'added_by' =>  auth()->user()->id,
+        'type' => $data['type'],
+        'availability' => $data['availability'],
+        'location' => $data['location'],
+        'pickup' => $data['pickup'],
+        'no_of_persons' => $data['no_of_persons'],
+        'manage_by' => $data['manage_by'],
+        'tags' => $data['tags'],
+    ]);
+
+                $images=$request->file('image');
+                $category=ImageCategory::where('image_type','Transportation')->pluck('id')->first();
+                foreach ($images as $image) {
+                    if ($image->isValid()) {
+
+                        $imagePath = $image->move('public/images'); // Store the image file
+
+                        $imageUrl = asset(str_replace('public', 'storage', $imagePath)); // Generate the image URL
+
+
+                        $agentImage = new AgentImage();
+                        $agentImage->type_id= $agentTransportation->id;
+                        $agentImage->category_id= $category;
+                        $agentImage->image =$imageUrl;
+                        $agentImage->save();
+                    }
+                } 
+
+    return ResponseService::successResponse('Agent transportation record created successfully',$agentTransportation);
+}
+
+}
+
+
+
 
 
     public function removePackages(Request $request){
@@ -101,7 +161,8 @@ class AgentController extends Controller
                 $category=ImageCategory::where('image_type','Operator')->pluck('id')->first();
                 foreach ($images as $image) {
                     if ($image->isValid()) {
-                        $imagePath = $image->store('public/images'); // Store the image file
+
+                        $imagePath = $image->move('public/images'); // Store the image file
 
                         $imageUrl = asset(str_replace('public', 'storage', $imagePath)); // Generate the image URL
 
