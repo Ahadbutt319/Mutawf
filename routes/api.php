@@ -70,8 +70,9 @@ Route::group(['middleware' => ['local']], function () {
         route::get('/operators',[AgentController::class,'fetchOperators']);
         route::post('/delpacks',[AgentController::class,'removePackages']);
         route::post('/add-transportation',[AgentController::class,'addTransportation']);
+        route::post('/add-visa',[AgentController::class,'addVisa']);
 
-      
+
 
 
         route::post('/add-card',[UserCardController::class,'create']);

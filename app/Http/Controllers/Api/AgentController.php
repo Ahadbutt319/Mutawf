@@ -6,6 +6,7 @@ use App\Models\Room;
 use App\Models\User;
 use App\Models\Agents;
 use App\Models\Operator;
+use App\Models\AgentVisa;
 use App\Models\AgentHotel;
 use App\Models\AgentImage;
 use App\Models\PackageKey;
@@ -22,6 +23,60 @@ use Illuminate\Support\Facades\Validator;
 class AgentController extends Controller
 {
     public function getProfile(){}
+
+
+public function addVisa(Request $request){
+
+    $data=$request->all();
+    $rules = [
+        'visa' => 'required|string',
+        'duration' => 'required|string',
+        'visa_to' => 'required|string',
+        'immigration' => 'required|string',
+        'validity'=>'required|string',
+        'manage_by' => 'required|string',
+        'images' => 'required|array|min:1|max:2',
+    ];
+
+    // Create a validator instance
+    $validation = Validator::make($data, $rules);
+
+    if($validation->fails())
+    {
+    return ResponseService::validationErrorResponse($validation->errors()->first());
+    }
+    else{
+
+        $visa = AgentVisa::create([
+            'visa' => $data['visa'],
+            'duration' => $data['duration'],
+            'visa_to' => $data['visa_to'],
+            'immigration' => $data['immigration'],
+            'manage_by' => $data['manage_by'],
+            'added_by' => auth()->user()->id,
+            'validity'=>$data['validity']
+        ]);
+        $images=$request->file('images');
+        $category=ImageCategory::where('image_type','Visa')->pluck('id')->first();
+        foreach ($images as $image) {
+            if ($image->isValid()) {
+
+                $imagePath = $image->move('public/images'); // Store the image file
+
+                $imageUrl = asset(str_replace('public', 'storage', $imagePath)); // Generate the image URL
+
+
+                $agentImage = new AgentImage();
+                $agentImage->type_id= $visa->id;
+                $agentImage->category_id= $category;
+                $agentImage->image =$imageUrl;
+                $agentImage->save();
+            }
+        }
+        return ResponseService::successResponse('Visa added Successfully!',$visa );
+}
+
+}
 
 
 public function addTransportation(Request $request){
@@ -72,7 +127,7 @@ if ($validation->fails()) {
                         $agentImage->image =$imageUrl;
                         $agentImage->save();
                     }
-                } 
+                }
 
     return ResponseService::successResponse('Agent transportation record created successfully',$agentTransportation);
 }
@@ -232,6 +287,7 @@ if ($validation->fails()) {
                 $agentImage = new AgentImage();
                 $agentImage->type_id	 = $agentHotel->id;
                 $agentImage->category_id = 2;
+
                 $agentImage->image = 'agent_images/' . $imageName;
                 $agentImage->save();
 
@@ -261,6 +317,7 @@ if ($validation->fails()) {
        'details'=>'required|string',
        'additional_Notes'=>'string',
        'managed_by'=>'required',
+       'status'=>'required',
        'image' => 'required|array|min:2|max:3',
        'image.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // Adjust validation rules as needed
     ]);
@@ -280,6 +337,7 @@ if ($validation->fails()) {
             'travel' => $data['travel']??NULL,
             'managed_by' => $data['managed_by'],
             'hotel' => $data['hotel']??NULL,
+            'status'=>$data['status'],
             'added_by'=>$agentId
         ]);
 
@@ -295,6 +353,7 @@ if ($validation->fails()) {
                     $agentImage = new AgentImage();
                     $agentImage->type_id= $agentPackage->id;
                     $agentImage->category_id	= 1;
+                    $agentImage->image_type=$data["image_type"];
                     $agentImage->image =$imageUrl;
                     $agentImage->save();
                 }
