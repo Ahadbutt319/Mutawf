@@ -70,7 +70,11 @@ class UserCardController extends Controller
             'code'=>$data['card_digits'],
             'user_id'=>auth()->user()->id
             ]);
-            return ResponseService::successResponse('Card added successfully',$card);
+            return response()->json([
+                'code'=>'200',
+                'message'=>'Card added Successfully',
+                'card'=>$card,
+            ]);
 
         }
 
@@ -81,7 +85,7 @@ class UserCardController extends Controller
         return response()->json([
             'code'=>200,
             'message'=>'Cards fetched successfully',
-            'cards' =>UserCard::select('card_type','code', 'expiry')->get()
+            'cards' =>UserCard::select('id','card_type','code', 'expiry')->get()
         ], 200);
     }
     /**
