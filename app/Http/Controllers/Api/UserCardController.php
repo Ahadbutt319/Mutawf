@@ -71,7 +71,7 @@ class UserCardController extends Controller
             'user_id'=>auth()->user()->id
             ]);
             return response()->json([
-                'code'=>'200',
+                'code'=>200,
                 'message'=>'Card added Successfully',
                 'card'=>$card,
             ]);
