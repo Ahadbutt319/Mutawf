@@ -25,6 +25,9 @@ class AgentController extends Controller
     public function getProfile(){}
 
 
+
+
+
 public function addVisa(Request $request){
 
     $data=$request->all();
@@ -138,14 +141,6 @@ if ($validation->fails()) {
 
 
 
-    public function removePackages(Request $request){
-        $data=$request->all();
-        AgentImage::where("type_id",$data["id"])->where('category_id',1)->delete();
-        PackageKey::where("package",$data["id"])->delete();
-        AgentPackage::where("id",$data["id"])->delete();
-        return ResponseService::successResponse('Package deleted ' );
-
-    }
 
     public function addImageCategory(Request $request){
         $data=$request->all();
@@ -360,20 +355,93 @@ if ($validation->fails()) {
             }
             $package=new PackageKey;
             $package->package=$agentPackage->id;
-        if(isset($data['visa'])){
+
+            if(isset($data['visa'])){
             $package->visa=true;
-        }
-        if(isset($data['travel'])){
+            }
+            if(isset($data['travel'])){
             $package->travel=true;
-        }
-        if(isset($data['hotel'])){
+            }
+            if(isset($data['hotel'])){
             $package->hotel=true;
-        }
-        $package->save();
+            }
+            $package->save();
             return ResponseService::successResponse('You Package is Added Successfully !',$agentPackage);
          }
     }
 
+    public function deleteVisa(Request $request){
+
+        $data = $request->all();
+        $validation = validator::make($data,[
+            'id'=>'required|exists:agent_visas,id',
+        ]);
+        if($validation->fails())
+        {
+
+            return ResponseService::validationErrorResponse($validation->errors()->first());
+
+        }
+       else{
+
+        $delId=ImageCategory::where('image_type','Visa')->first();
+        AgentImage::where("type_id",$data["id"])->where('category_id',$delId)->delete();
+        AgentVisa::where('id',$data['id'])->delete();
+
+        return response()->json(['code'=>200,'message'=>'Package Successfully deleted'],200);
+
+    };
+
+
+}
+
+
+public function deleteOperator(Request $request){
+
+
+    $data = $request->all();
+    $validation = validator::make($data,[
+        'id'=>'required|exists:operators,id',
+    ]);
+    if($validation->fails())
+    {
+      return ResponseService::validationErrorResponse($validation->errors()->first());
+    }
+   else{
+
+    $delId=ImageCategory::where('image_type','Operator')->first();
+    AgentImage::where("type_id",$data["id"])->where('category_id',$delId)->delete();
+    Operator::where('id',$data['id'])->delete();
+
+    return response()->json(['code'=>200,'message'=>'Operator Successfully deleted'],200);
+
+};
+
+}
+
+    public function deletePackage(Request $request){
+
+        $data = $request->all();
+        $validation = validator::make($data,[
+            'id'=>'required|exists:agent_packages,id',
+        ]);
+        if($validation->fails())
+        {
+          return ResponseService::validationErrorResponse($validation->errors()->first());
+        }
+       else{
+
+        $delId=ImageCategory::where('image_type','Package')->first();
+        AgentImage::where("type_id",$data["id"])->where('category_id',$delId)->delete();
+        PackageKey::where("package",$data["id"])->delete();
+        AgentPackage::where('id',$data['id'])->delete();
+
+        return response()->json(['code'=>200,'message'=>'Package Successfully deleted'],200);
+
+    };
+
+
+}
 
     public function getGeneralPackage()
     {
@@ -394,6 +462,7 @@ if ($validation->fails()) {
         ], 200);
     }
 
+   /*
     public function getPackages()
     {
         return response()->json([
@@ -403,5 +472,7 @@ if ($validation->fails()) {
         ], 200);
 
     }
+
+    */
 
 }

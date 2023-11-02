@@ -68,9 +68,11 @@ Route::group(['middleware' => ['local']], function () {
         route::post('/add-ImageCategory',[AgentController::class,'addImageCategory']);
         route::post('/become-operator',[AgentController::class,'becomeAnOperator']);
         route::get('/operators',[AgentController::class,'fetchOperators']);
-        route::post('/delpacks',[AgentController::class,'removePackages']);
         route::post('/add-transportation',[AgentController::class,'addTransportation']);
         route::post('/add-visa',[AgentController::class,'addVisa']);
+        route::post('/delete-visa',[AgentController::class,'deleteVisa']);
+        route::post('/delete-package',[AgentController::class,'deletePackage']);
+        route::post('/delete-operator',[AgentController::class,'deleteOperator']);
 
 
 
