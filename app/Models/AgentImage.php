@@ -8,6 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class AgentImage extends Model
 {
     use HasFactory;
-    protected $fillable = ['image','type_id','category_id'];
+    protected $fillable = ['image','type_id','category_id','image_type'];
 
 }

@@ -19,7 +19,8 @@ class AgentPackage extends Model
         'travel',
         'managed_by',
         'hotel',
-        'added_by'
+        'added_by',
+        'status'
     ];
 
     public function Keys(){
