@@ -73,6 +73,7 @@ Route::group(['middleware' => ['local']], function () {
         route::post('/delete-visa',[AgentController::class,'deleteVisa']);
         route::post('/delete-package',[AgentController::class,'deletePackage']);
         route::post('/delete-operator',[AgentController::class,'deleteOperator']);
+        route::post('/update-package',[AgentController::class,'updatePackage']);
 
 
 
