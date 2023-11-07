@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+// use Database\Seeders\ImageCategoy;
 
 class DatabaseSeeder extends Seeder
 {
@@ -25,7 +26,10 @@ class DatabaseSeeder extends Seeder
             LanguagesSeeder::class,
             CurrenciesSeader::class,
             UsersSeeder::class,
-            HotelSeeder::class
+            HotelSeeder::class,
+            ImageCategoy::class,
+            ContentType::class,
+            ComplaintStatus::class,
         ]);
     }
 }

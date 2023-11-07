@@ -19,7 +19,6 @@ class Faq extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'category_id',
         'created_by',
         'question',
         'answer',
@@ -31,14 +30,22 @@ class Faq extends Model
      *
      * @var array<string, string>
      */
+
     protected $casts = [
         'created_at' => 'datetime',
-        'updated_at' => 'datetime'
+        'updated_at' => 'datetime',
+        'question' => 'json',
+        'answer' => 'json'
     ];
-
-    public function category(): BelongsTo
+    public function getdata()
     {
-        return $this->belongsTo(Category::class);
+        $data['id'] = $this->id;
+        $data['question'] = $this->question;
+        $data['answer'] = $this->answer;
+        $data['is_active'] = $this->is_active;
+        $data['created_by'] = $this->created_by;
+        $data["createdAt"] = date(config("app.date_format"), strtotime($this->created_at));
+        return $data;
     }
 
     public function createdBy(): BelongsTo

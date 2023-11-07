@@ -17,6 +17,9 @@ class ImageCategoy extends Seeder
             ['image_type' => 'Hotel'],
             ['image_type' => 'Package'],
             ['image_type' => 'Room'],
+            ['image_type' => 'Visa'],
+            ['image_type' => 'Transportation'],
+            ['image_type' => 'Operator'],
         ]);
     }
 }
