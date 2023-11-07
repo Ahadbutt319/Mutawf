@@ -4,26 +4,26 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Bus\BusServiceProvider;
 use App\Http\Controllers\SendSmsController;
-use App\Http\Controllers\api\FaqsController;
+use App\Http\Controllers\Api\FaqsController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\AgentController;
 use App\Http\Controllers\Api\HotelController;
 use App\Http\Controllers\Api\FlightController;
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\api\AboutUsController;
+use App\Http\Controllers\Api\AboutUsController;
 use App\Http\Controllers\Api\CompanyController;
-use App\Http\Controllers\api\ContentController;
-use App\Http\Controllers\api\CustomerController;
+use App\Http\Controllers\Api\ContentController;
+use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\LanguageController;
-use App\Http\Controllers\api\superadmin\ComplainController;
+use App\Http\Controllers\Api\superadmin\ComplainController;
 use App\Http\Controllers\Api\UserCardController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
-use App\Http\Controllers\api\TermAndConditionController;
-use App\Http\Controllers\api\superadmin\SuperadmiController;
-use App\Http\Controllers\api\superadmin\ComplainTypeController;
+use App\Http\Controllers\Api\TermAndConditionController;
+use App\Http\Controllers\Api\superadmin\SuperadmiController;
+use App\Http\Controllers\Api\superadmin\ComplainTypeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -66,7 +66,6 @@ Route::group(['middleware' => ['local']], function () {
     Route::post('locals', [LanguageController::class, 'changeLocale']);
 
     Route::group(['middleware' => ['auth:api', 'last_seen']], function () {
-
         route::get('/get-operators', [AgentController::class, 'getOperators']);
         route::post('/become-operator', [AgentController::class, 'becomeAnOperator']);
         route::post('/create-package', [AgentController::class, 'addPackage']);
@@ -84,36 +83,6 @@ Route::group(['middleware' => ['local']], function () {
         route::post('/add-card', [UserCardController::class, 'create']);
         route::post('/remove-card', [UserCardController::class, 'remove']);
         route::get('/cards', [UserCardController::class, 'showCards']);
-
-
-        route::get('/get-operators',[AgentController::class,'getOperators']);
-        route::post('/become-operator',[AgentController::class,'becomeAnOperator']);
-        route::post('/create-package',[AgentController::class,'addPackage']);
-        route::get('/packages',[AgentController::class,'getGeneralPackage']);
-        route::post('/add-hotels',[AgentController::class,'addHotel']);
-        route::get('/get-hotels',[AgentController::class,'getHotels']);
-        route::post('/add-ImageCategory',[AgentController::class,'addImageCategory']);
-        route::post('/become-operator',[AgentController::class,'becomeAnOperator']);
-        route::get('/operators',[AgentController::class,'fetchOperators']);
-        route::post('/add-transportation',[AgentController::class,'addTransportation']);
-        route::post('/add-visa',[AgentController::class,'addVisa']);
-        route::post('/delete-visa',[AgentController::class,'deleteVisa']);
-        route::post('/delete-package',[AgentController::class,'deletePackage']);
-        route::post('/delete-operator',[AgentController::class,'deleteOperator']);
-        route::post('/update-package',[AgentController::class,'updatePackage']);
-
-
-
-
-        route::post('/add-card',[UserCardController::class,'create']);
-        route::post('/remove-card',[UserCardController::class,'remove']);
-
-        route::get('/cards',[UserCardController::class,'showCards']);
-
-
-
-
-
         Route::get('/verification-status', [UserController::class, 'getVerificationStatus']);
         Route::post('/update-password', [UserController::class, 'updatePassword']);
         Route::get('/auth-data', [UserController::class, 'authData']);

@@ -23,124 +23,14 @@ use Illuminate\Support\Facades\Validator;
 class AgentController extends Controller
 {
 
-    public function getProfile()
+   
 
     public function getProfile(){}
 
-
     public function updatePackage(Request $request){
-
-        $data=$request->all();
-
-        $rules=[
-            'id'=>'required',
-            'package_name'=>'nullable|string',
-            'duration'=>'nullable|string',
-            'details'=>'nullable|string',
-            'additional_Notes'=>'string',
-            'managed_by'=>'nullable',
-            'status'=>'nullable',
-            'image' => 'nullable|array|min:2|max:3',
-            'image.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Adjust
-        ];
-        $validator=validator::make($data,$rules);
-
-        if ($validator->fails()) {
-            return ResponseService::validationErrorResponse($validator->errors()->first());
-        }
-
-        else{
-            $data;
-            $package=AgentPackage::where('id',$data['id'])->first();
-
-
-         // Check each field and update it if it's not null
-    if ($request->filled('package_name')) {
-        $data['package_name'] = $request->input('package_name');
-    }
-
-    if ($request->filled('duration')) {
-        $data['duration'] = $request->input('duration');
-    }
-
-    if ($request->filled('details')) {
-        $data['details'] = $request->input('details');
-    }
-
-    if ($request->filled('additional_Notes')) {
-        $data['additional_Notes'] = $request->input('additional_Notes');
-    }
-
-    if ($request->filled('managed_by')) {
-        $data['managed_by'] = $request->input('managed_by');
-    }
-
-    if ($request->filled('status')) {
-        $data['status'] = $request->input('status');
-    }
-
-    $packageKeys=PackageKey::where('package',$data['id'])->first();
-
-    if(isset($data['visa'])){
-    $packageKeys->visa=true;
-    }
-    if(isset($data['travel'])){
-    $packageKeys->travel=true;
-    }
-    if(isset($data['hotel'])){
-    $packageKeys->hotel=true;
-    }
-    $packageKeys->update();
-    // Handle image uploads if provided
-    if ($request->has('image')) {
-
-        $images=$request->file('images');
-        $category=ImageCategory::where('image_type','Package')->pluck('id')->first();
-        foreach ($images as $image) {
-            if ($image->isValid()) {
-
-                $imagePath = $image->move('public/images'); // Store the image file
-
-                $imageUrl = asset(str_replace('public', 'storage', $imagePath)); // Generate the image URL
-
-
-                $agentImage = new AgentImage();
-                $agentImage->type_id= $package->id;
-                $agentImage->category_id= $category;
-                $agentImage->image =$imageUrl;
-                $agentImage->update();
-            }
-        }
-    }
-
-                $package->update($data);
-                return ResponseService::successResponse('Package updated Successfully!',$package );
-
-        }
     }
 
 
-
-public function addVisa(Request $request){
-
-    $data=$request->all();
-    $rules = [
-        'visa' => 'required|string',
-        'duration' => 'required|string',
-        'visa_to' => 'required|string',
-        'immigration' => 'required|string',
-        'validity'=>'required|string',
-        'manage_by' => 'required|string',
-        'images' => 'required|array|min:1|max:2',
-    ];
-
-    // Create a validator instance
-    $validation = Validator::make($data, $rules);
-
-    if($validation->fails())
-
-    {
-    }
     public function addVisa(Request $request)
     {
 
