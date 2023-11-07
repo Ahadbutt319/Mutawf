@@ -66,6 +66,7 @@ Route::group(['middleware' => ['local']], function () {
     Route::post('locals', [LanguageController::class, 'changeLocale']);
 
     Route::group(['middleware' => ['auth:api', 'last_seen']], function () {
+
         route::get('/get-operators', [AgentController::class, 'getOperators']);
         route::post('/become-operator', [AgentController::class, 'becomeAnOperator']);
         route::post('/create-package', [AgentController::class, 'addPackage']);
@@ -83,6 +84,36 @@ Route::group(['middleware' => ['local']], function () {
         route::post('/add-card', [UserCardController::class, 'create']);
         route::post('/remove-card', [UserCardController::class, 'remove']);
         route::get('/cards', [UserCardController::class, 'showCards']);
+
+
+        route::get('/get-operators',[AgentController::class,'getOperators']);
+        route::post('/become-operator',[AgentController::class,'becomeAnOperator']);
+        route::post('/create-package',[AgentController::class,'addPackage']);
+        route::get('/packages',[AgentController::class,'getGeneralPackage']);
+        route::post('/add-hotels',[AgentController::class,'addHotel']);
+        route::get('/get-hotels',[AgentController::class,'getHotels']);
+        route::post('/add-ImageCategory',[AgentController::class,'addImageCategory']);
+        route::post('/become-operator',[AgentController::class,'becomeAnOperator']);
+        route::get('/operators',[AgentController::class,'fetchOperators']);
+        route::post('/add-transportation',[AgentController::class,'addTransportation']);
+        route::post('/add-visa',[AgentController::class,'addVisa']);
+        route::post('/delete-visa',[AgentController::class,'deleteVisa']);
+        route::post('/delete-package',[AgentController::class,'deletePackage']);
+        route::post('/delete-operator',[AgentController::class,'deleteOperator']);
+        route::post('/update-package',[AgentController::class,'updatePackage']);
+
+
+
+
+        route::post('/add-card',[UserCardController::class,'create']);
+        route::post('/remove-card',[UserCardController::class,'remove']);
+
+        route::get('/cards',[UserCardController::class,'showCards']);
+
+
+
+
+
         Route::get('/verification-status', [UserController::class, 'getVerificationStatus']);
         Route::post('/update-password', [UserController::class, 'updatePassword']);
         Route::get('/auth-data', [UserController::class, 'authData']);
