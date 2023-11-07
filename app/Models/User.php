@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -123,7 +124,14 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(Activity::class);
     }
-
+    public function aboutus() :HasOne
+    {
+        return $this->hasone(AboutUs::class);
+    }
+    public function termsandcondtion(): HasOne
+    {
+        return $this->hasone(TermAndCondition::class );
+    }
     public function accounts(): HasMany
     {
         return $this->hasMany(UserAccount::class);
@@ -158,7 +166,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(Blog::class, 'author_id');
     }
-
+    
     public function umrahs(): HasMany
     {
         return $this->hasMany(Umrah::class);
@@ -173,4 +181,8 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return random_int(100000, 999999); // generate random code of six digits
     }
+    public function complains() {
+        return $this->hasMany(Complain::class);
+    }
+  
 }

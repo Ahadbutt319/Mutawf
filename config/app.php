@@ -59,6 +59,7 @@ return [
     'frontend_url' => env('FRONTEND_URL'),
 
     'asset_url' => env('ASSET_URL'),
+    'date_format' => "d-m-Y h:i A",
 
     /*
     |--------------------------------------------------------------------------
