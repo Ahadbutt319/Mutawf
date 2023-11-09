@@ -23,11 +23,348 @@ use Illuminate\Support\Facades\Validator;
 class AgentController extends Controller
 {
 
-   
 
-    public function getProfile(){}
+
+
+public function updateTransportation(Request $request){
+    $data=$request->all();
+    $rules = [
+        'id'=>'required',
+        'type' => 'nullable|string',
+        'availability' => 'nullable|string',
+        'location' => 'nullable|string',
+        'pickup' => 'nullable|string',
+        'no_of_persons' => 'nullable|integer',
+        'manage_by' => 'nullable|string',
+        'tags' => 'nullable|string',
+        'image' => 'nullable|array|min:1',
+        'image.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+    ];
+
+    // Create a validator instance
+    $validation = Validator::make($data, $rules);
+
+    if($validation->fails())
+    {
+    return ResponseService::validationErrorResponse($validation->errors()->first());
+    }
+    else{
+
+        $transportation = AgentTransportation::where('id',$data['id'])->first();
+
+        $data ;
+
+        // Check each field and update it if it's not empty
+        if ($request->filled('type')) {
+            $data['type'] = $request->input('type');
+        }
+
+        if ($request->filled('availability')) {
+            $data['availability'] = $request->input('availability');
+        }
+
+        if ($request->filled('location')) {
+            $data['location'] = $request->input('location');
+        }
+
+        if ($request->filled('pickup')) {
+            $data['pickup'] = $request->input('pickup');
+        }
+
+        if ($request->filled('no_of_persons')) {
+            $data['no_of_persons'] = $request->input('no_of_persons');
+        }
+
+        if ($request->filled('manage_by')) {
+            $data['manage_by'] = $request->input('manage_by');
+        }
+
+        if ($request->filled('tags')) {
+            $data['tags'] = $request->input('tags');
+        }
+
+        // Handle image uploads if provided
+        if ($request->has('image')) {
+            $images=$request->file('image');
+            $category=ImageCategory::where('image_type','Transportation')->pluck('id')->first();
+            foreach ($images as $image) {
+                if ($image->isValid()) {
+
+                    $imagePath = $image->move('public/images'); // Store the image file
+
+                    $imageUrl = asset(str_replace('public', 'storage', $imagePath)); // Generate the image URL
+
+
+                    $agentImage = new AgentImage();
+                    $agentImage->type_id= $transportation->id;
+                    $agentImage->category_id= $category;
+                    $agentImage->image =$imageUrl;
+                    $agentImage->save();
+                }
+            }
+        }
+
+        $transportation->update($data);
+}
+        return ResponseService::successResponse('Transportation is updated successfully !',$transportation );
+}
+
+
+
+    public function updateVisa(Request $request){
+        $data=$request->all();
+        $rules = [
+            'id'=>'required',
+            'visa' => 'nullable|string',
+            'duration' => 'nullable|string',
+            'visa_to' => 'nullable|string',
+            'immigration' => 'nullable|string',
+            'validity'=>'nullable|string',
+            'manage_by' => 'nullable|string',
+            'images' => 'nullable|array|min:1|max:2',
+        ];
+
+        // Create a validator instance
+        $validation = Validator::make($data, $rules);
+
+        if($validation->fails())
+        {
+        return ResponseService::validationErrorResponse($validation->errors()->first());
+        }
+        else{
+
+            $visa = AgentVisa::where('id',$data['id'])->first();
+
+            // Create an array to store the data to update
+            $data;
+
+            // Check each field and update it if it's not null
+            if ($request->filled('visa')) {
+                $data['visa'] = $request->input('visa');
+            }
+
+            if ($request->filled('duration')) {
+                $data['duration'] = $request->input('duration');
+            }
+
+            if ($request->filled('visa_to')) {
+                $data['visa_to'] = $request->input('visa_to');
+            }
+
+            if ($request->filled('immigration')) {
+                $data['immigration'] = $request->input('immigration');
+            }
+
+            if ($request->filled('validity')) {
+                $data['validity'] = $request->input('validity');
+            }
+
+            if ($request->filled('manage_by')) {
+                $data['manage_by'] = $request->input('manage_by');
+            }
+
+            // Handle image uploads if provided
+            if ($request->has('images')) {
+
+        $images=$request->file('images');
+        $category=ImageCategory::where('image_type','Visa')->pluck('id')->first();
+        foreach ($images as $image) {
+            if ($image->isValid()) {
+
+                $imagePath = $image->move('public/images'); // Store the image file
+
+                $imageUrl = asset(str_replace('public', 'storage', $imagePath)); // Generate the image URL
+
+
+                $agentImage = new AgentImage();
+                $agentImage->type_id= $visa->id;
+                $agentImage->category_id= $category;
+                $agentImage->image =$imageUrl;
+                $agentImage->save();
+            }
+
+        }
+
+    }
+            $visa->update($data);
+}
+            return ResponseService::successResponse('Visa is updated successfully !',$visa );
+
+    }
+
+
+
+
+    public function updateOperator(Request $request){
+        $data=$request->all();
+        $rules = [
+            'name' => 'nullable|string',
+            'phone' => 'nullable|string',
+            'email' => 'nullable|email',
+            'clearance_area' => 'nullable|string',
+            'availability' => 'nullable|string',
+            'type' => 'nullable|string',
+            'images' => 'nullable|array|min:1|max:2',
+        ];
+
+        // Create a validator instance
+        $validation = Validator::make($data, $rules);
+
+        if($validation->fails())
+        {
+        return ResponseService::validationErrorResponse($validation->errors()->first());
+        }
+        else{
+
+            $operator = Operator::where('id',$data['id'])->first();
+
+            // Create an array to store the data to update
+            $data;
+
+            // Check each field and update it if it's not null
+            if ($request->filled('name')) {
+                $data['name'] = $request->input('name');
+            }
+
+            if ($request->filled('phone')) {
+                $data['phone'] = $request->input('phone');
+            }
+
+            if ($request->filled('email')) {
+                $data['email'] = $request->input('email');
+            }
+
+            if ($request->filled('clearance_area')) {
+                $data['clearance_area'] = $request->input('clearance_area');
+            }
+
+            if ($request->filled('availability')) {
+                $data['availability'] = $request->input('availability');
+            }
+
+            if ($request->filled('type')) {
+                $data['type'] = $request->input('type');
+            }
+
+            // Handle image uploads if provided
+            if ($request->has('images')) {
+
+                $images=$request->file('images');
+                $category=ImageCategory::where('image_type','Operator')->pluck('id')->first();
+                foreach ($images as $image) {
+                    if ($image->isValid()) {
+
+                        $imagePath = $image->move('public/images'); // Store the image file
+
+                        $imageUrl = asset(str_replace('public', 'storage', $imagePath)); // Generate the image URL
+
+
+                        $agentImage = new AgentImage();
+                        $agentImage->type_id= $operator->id;
+                        $agentImage->category_id= $category;
+                        $agentImage->image =$imageUrl;
+                        $agentImage->save();
+                    }
+                }
+            }
+
+            // Update the Operator data
+            $operator->update($data);
+
+            }
+            return ResponseService::successResponse('Your information is updated successfully !',$operator );
+
+    }
 
     public function updatePackage(Request $request){
+
+        $data=$request->all();
+
+        $rules=[
+            'id'=>'required',
+            'package_name'=>'nullable|string',
+            'duration'=>'nullable|string',
+            'details'=>'nullable|string',
+            'additional_Notes'=>'string',
+            'managed_by'=>'nullable',
+            'status'=>'nullable',
+            'image' => 'nullable|array|min:2|max:3',
+            'image.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Adjust
+        ];
+        $validator=validator::make($data,$rules);
+
+        if ($validator->fails()) {
+            return ResponseService::validationErrorResponse($validator->errors()->first());
+        }
+
+        else{
+            $data;
+            $package=AgentPackage::where('id',$data['id'])->first();
+
+
+         // Check each field and update it if it's not null
+    if ($request->filled('package_name')) {
+        $data['package_name'] = $request->input('package_name');
+    }
+
+    if ($request->filled('duration')) {
+        $data['duration'] = $request->input('duration');
+    }
+
+    if ($request->filled('details')) {
+        $data['details'] = $request->input('details');
+    }
+
+    if ($request->filled('additional_Notes')) {
+        $data['additional_Notes'] = $request->input('additional_Notes');
+    }
+
+    if ($request->filled('managed_by')) {
+        $data['managed_by'] = $request->input('managed_by');
+    }
+
+    if ($request->filled('status')) {
+        $data['status'] = $request->input('status');
+    }
+
+    $packageKeys=PackageKey::where('package',$data['id'])->first();
+
+    if(isset($data['visa'])){
+    $packageKeys->visa=true;
+    }
+    if(isset($data['travel'])){
+    $packageKeys->travel=true;
+    }
+    if(isset($data['hotel'])){
+    $packageKeys->hotel=true;
+    }
+    $packageKeys->update();
+    // Handle image uploads if provided
+    if ($request->has('image')) {
+
+        $images=$request->file('images');
+        $category=ImageCategory::where('image_type','Package')->pluck('id')->first();
+        foreach ($images as $image) {
+            if ($image->isValid()) {
+
+                $imagePath = $image->move('public/images'); // Store the image file
+
+                $imageUrl = asset(str_replace('public', 'storage', $imagePath)); // Generate the image URL
+
+
+                $agentImage = new AgentImage();
+                $agentImage->type_id= $package->id;
+                $agentImage->category_id= $category;
+                $agentImage->image =$imageUrl;
+                $agentImage->update();
+            }
+        }
+    }
+
+                $package->update($data);
+                return ResponseService::successResponse('Package updated Successfully!',$package );
+
+        }
     }
 
 

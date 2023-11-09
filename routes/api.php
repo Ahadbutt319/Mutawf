@@ -80,6 +80,10 @@ Route::group(['middleware' => ['local']], function () {
         route::post('/delete-visa', [AgentController::class, 'deleteVisa']);
         route::post('/delete-package', [AgentController::class, 'deletePackage']);
         route::post('/delete-operator', [AgentController::class, 'deleteOperator']);
+        route::post('/update-package',[AgentController::class,'updatePackage']);
+        route::post('/update-operator',[AgentController::class,'updateOperator']);
+        route::post('/update-visa',[AgentController::class,'updateVisa']);
+        route::post('/update-transportation',[AgentController::class,'updateTransportation']);
         route::post('/add-card', [UserCardController::class, 'create']);
         route::post('/remove-card', [UserCardController::class, 'remove']);
         route::get('/cards', [UserCardController::class, 'showCards']);
