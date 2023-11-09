@@ -101,6 +101,7 @@ Route::group(['middleware' => ['local']], function () {
             route::post('/serach/packages', [CustomerController::class, 'searchpackage']);
             route::get('/faqs', [FaqsController::class, 'index']);
             route::get('/content', [ContentController::class, 'index']);
+            route::get('/cancellation', [ContentController::class, 'cancellation']);
             route::get('/complain-types', [ComplainTypeController::class, 'index']);
         });
         // All admin  routes
