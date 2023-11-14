@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\ComplainType;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Complain extends Model
 {
@@ -49,9 +50,10 @@ class Complain extends Model
     public function admins() {
         return $this->belongsToMany(User::class, 'complains_users');
     }
-    public function actions() {
-        return $this->belongsToMany(AdminAction::class, 'action_complain_user',)
-            ->withPivot(['details']);
+    // Define the relationship with actions
+    public function actions()
+    {
+        return $this->belongsToMany(Action::class, 'action_complain_user', 'complain_id', 'action_id');
     }
 
 }

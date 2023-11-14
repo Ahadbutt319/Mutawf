@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\AgentImage;
-
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class AgentPackage extends Model
 {
@@ -20,7 +20,9 @@ class AgentPackage extends Model
         'managed_by',
         'hotel',
         'added_by',
-        'status'
+        'status',
+        'price',
+        'person'
     ];
 
     public function Keys(){
@@ -29,4 +31,13 @@ class AgentPackage extends Model
     public function Images(){
         return $this->hasMany(AgentImage::class,'type_id')->where('category_id',1);
     }
+    
+    public function package_activities() :HasMany
+    {
+        return $this->hasMany(AgentPackageActivity::class,'package_id');
+    } 
+    public function packagebookings()
+    {
+        return $this->belongsToMany(PackageBooking::class, 'bookpackages', 'package_id', 'booking_id');
+    } 
 }

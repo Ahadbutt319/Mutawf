@@ -18,6 +18,7 @@ use App\Models\ImageCategory;
 use App\Services\ResponseService;
 use App\Models\AgentTransportation;
 use App\Http\Controllers\Controller;
+use App\Models\AgentPackageActivity;
 use Illuminate\Support\Facades\Validator;
 
 class AgentController extends Controller
@@ -567,7 +568,7 @@ public function updateTransportation(Request $request){
             'image' => 'required|array|min:2|max:3',
             'room_image' => 'required|array|min:2|max:3',
             'image.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // Adjust validation rules as needed
-            'room_image.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // Adjust validation rules as needed
+            ' .*' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // Adjust validation rules as needed
             //'reference_number' => 'required|string',
             'room_categories' => 'required|array',
         ]);
@@ -654,18 +655,26 @@ public function updateTransportation(Request $request){
                 'managed_by' => $data['managed_by'],
                 'hotel' => $data['hotel'] ?? NULL,
                 'status' => $data['status'],
+                'person' => $data['person'],
+                'price' => $data['price'],
                 'added_by' => $agentId
             ]);
+            $activityimagePath = $data['acitivity_image']->store('public/images'); // Store the image file
+            $activityimageUrl = asset(str_replace('public', 'storage', $activityimagePath)); // Generate the image URL
+            $packageactivities =   AgentPackageActivity::create([
+                'name' => $data['activity_name'],
+                'description' => $data['activity_description'],
+                'user_id' => $agentId,
+                'package_id' => $agentPackage->id,
+                'image'=> $activityimageUrl,
 
+            ]);
             $images = $request->file('image');
             //adding images to dabatabse
             foreach ($images as $image) {
                 if ($image->isValid()) {
                     $imagePath = $image->store('public/images'); // Store the image file
-
                     $imageUrl = asset(str_replace('public', 'storage', $imagePath)); // Generate the image URL
-
-
                     $agentImage = new AgentImage();
                     $agentImage->type_id = $agentPackage->id;
                     $agentImage->category_id    = 1;
@@ -687,7 +696,7 @@ public function updateTransportation(Request $request){
                 $package->hotel = true;
             }
             $package->save();
-            return ResponseService::successResponse('You Package is Added Successfully !', $agentPackage);
+            return ResponseService::successResponse('You Package is Added Successfully !', $agentPackage,$packageactivities);
         }
     }
 
@@ -754,7 +763,7 @@ public function updateTransportation(Request $request){
         return response()->json([
             'code' => 200,
             'message' => 'Packages fetched successfully',
-            'packages' =>  AgentPackage::with('Keys')->with('Images')->get()
+            'packages' =>  AgentPackage::with('Keys')->with('packageactivites')->with('Images')->get()
         ], 200);
     }
     public function getHotels()

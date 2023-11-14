@@ -97,6 +97,9 @@ Route::group(['middleware' => ['local']], function () {
             route::get('/packages', [CustomerController::class, 'getpackages']);
             route::post('/package', [CustomerController::class, 'detailpackage']);
             route::post('/serach/packages', [CustomerController::class, 'searchpackage']);
+            route::post('/book/package', [CustomerController::class, 'packagebooking']);
+            route::get('/all-bookings', [CustomerController::class, 'getbookings']);
+            route::post('/reach-us', [CustomerController::class, 'contactus']);
             route::get('/faqs', [FaqsController::class, 'index']);
             route::get('/content', [ContentController::class, 'index']);
             route::get('/complain-types', [ComplainTypeController::class, 'index']);

@@ -154,16 +154,11 @@ class ComplainController extends Controller
         try {
             $role = auth()->user()->role->role;
             if ($role === 'admin') {
-                $data = Complain::where('id', $request->id )->with('status')->get();
-                dd($data);
-                $records = [];
-                foreach ($data as $d) {
-                    $records[] = $d->getdata();
-                }
+                $data = Complain::where('id', $request->id )->with('actions')->first();
                 return response()->json([
                     'code' => 200,
-                    'message' => 'All Complains has been  fetched successfully',
-                    'data' => $records,
+                    'message' => ' Complain has been  fetched successfully',
+                    'data' =>  $data,
                 ], 200);
             } else {
                 return response()->json([
