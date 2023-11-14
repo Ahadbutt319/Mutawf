@@ -181,8 +181,15 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return random_int(100000, 999999); // generate random code of six digits
     }
+  
     public function complains() {
         return $this->hasMany(Complain::class);
+    }
+    public function complaints() {
+        return $this->belongsToMany(Complain::class, 'complains_users');
+    }
+    public function actions() {
+        return $this->belongsToMany(AdminAction::class, 'PIVOT', 'complain_id', 'user_id');
     }
   
 }
