@@ -14,6 +14,7 @@ use App\Models\RoomBooking;
 use App\Models\AgentPackage;
 use App\Models\RoomCategory;
 use Illuminate\Http\Request;
+use App\Models\GroundService;
 use App\Models\ImageCategory;
 use App\Services\ResponseService;
 use App\Models\AgentTransportation;
@@ -24,6 +25,41 @@ use Illuminate\Support\Facades\Validator;
 class AgentController extends Controller
 {
 
+
+public function addGroundServices(Request $request){
+
+    $data = $request->All();
+    $validation = validator::make($data, [
+        'hotels' => 'required|string|exists:AgentHotel,hotel_name',
+        'guider_name' => 'required|string',
+        'tour_location' => 'string',
+        'services' => 'required|exists:AgentServices,name',// Adjust validation rules as needed
+    ]);
+
+    if ($validation->fails()) {
+        return ResponseService::validationErrorResponse($validation->errors()->first());
+    }
+     else {
+        $agentId = User::where('id', auth()->user()->id)->pluck('id')->first();
+        $groundService = new GroundService;
+        $groundService->added_by = $agentId;
+        $groundService->hotels = $data['hotels'];
+        $groundService->guider_name = $data['guider_name'];
+        $groundService->tour_location = $data['tour_location'];
+        $groundService->services = $data['services'];
+        $groundService->save();
+        return ResponseService::successResponse('You Service is Added Successfully !', $groundService);
+    }
+
+}
+
+public function getGroundServices(){
+    return response()->json([
+        'code' => 200,
+        'message' => 'GroundServices fetched successfully',
+        'packages' =>  GroundService::All()
+    ], 200);
+}
 
 
 

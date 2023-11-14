@@ -16,6 +16,34 @@ class ContentController extends Controller
     /**
      * Display a listing of the resource.
      */
+    public function cancellation()
+    {
+        try {
+            $role = auth()->user()->role->role;
+            if ($role === 'admin' || $role === 'customer') {
+                $General=Content::where('content_id' , 6 )->first();
+                $Refunds=Content::where('content_id' , 7 )->first();
+                $Cancellationbythecustomer=Content::where('content_id' , 8 )->first();
+                $Assistedrefund=Content::where('content_id' , 9 )->first();
+                $Specialcases=Content::where('content_id' , 10 )->first();
+                return response()->json([
+                    'code' => 200,
+                    'message' => 'Terms fetched successfully',
+                    'General'=>$General,
+                    'Refunds'=>$Refunds,
+                    'Cancellation by the customer'=>$Cancellationbythecustomer,
+                    'Assisted refund'=>$Assistedrefund,
+                    'Special cases'=>$Specialcases,
+                ], 200);
+            } else {
+                return response()->json([
+                    'error' => 'you are not authorized',
+                ], 500);
+            }
+        } catch (\Throwable $th) {
+            return response()->json(['error' => $th->getMessage(), 'data' => null], 500);
+        }
+    }
     public function index()
     {
         try {
@@ -25,6 +53,7 @@ class ContentController extends Controller
                 $termsandcondition = Content::where('content_id' , 2 )->first();
                 $disclimars = Content::where('content_id' , 3 )->first();
                 $privacy = Content::where('content_id' , 4 )->first();
+                $policycancellation=Content::where('content_id' , 5 )->first();
                 return response()->json([
                     'code' => 200,
                     'message' => 'Terms fetched successfully',
@@ -32,6 +61,7 @@ class ContentController extends Controller
                     'terms_condition' =>   $termsandcondition,
                     'disclimars' =>   $disclimars,
                     'privacy' =>   $privacy,
+                    'policycancellation'=>$policycancellation
                 ], 200);
             } else {
                 return response()->json([
@@ -118,7 +148,7 @@ class ContentController extends Controller
         try {
             $role = auth()->user()->role->role;
             if ($role === 'admin' || $role === 'customer') {
-                
+
                 $record = Content::find($id);
                 if ( $record) {
                     $data = Content::where('id',$id)->delete();

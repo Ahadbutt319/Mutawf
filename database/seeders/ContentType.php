@@ -18,6 +18,11 @@ class ContentType extends Seeder
             ['name' => 'Termandcondition'],
             ['name' => 'disclimars'],
             ['name' => 'privacy'],
+            ['name' => 'General'],
+            ['name' => 'Refunds'],
+            ['name' => 'Cancellation by the customer'],
+            ['name' => 'Assisted refund'],
+            ['name' => 'Special cases'],
 
         ]);
     }
