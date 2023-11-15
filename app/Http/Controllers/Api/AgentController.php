@@ -600,6 +600,7 @@ public function updateTransportation(Request $request){
             'hotel_name' => 'required|string',
             'private_transport' => 'required|string',
             'location' => 'required|string',
+            'luxuries'=>'required|string',
             'details' => 'required|string',
             'image' => 'required|array|min:2|max:3',
             'room_image' => 'required|array|min:2|max:3',
@@ -607,6 +608,9 @@ public function updateTransportation(Request $request){
             ' .*' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // Adjust validation rules as needed
             //'reference_number' => 'required|string',
             'room_categories' => 'required|array',
+            'image_type'=>'required|array',
+            'room_image_type'=>'required|array'
+
         ]);
 
 
@@ -620,42 +624,56 @@ public function updateTransportation(Request $request){
                 'private_transport' => $data['private_transport'],
                 'location' => $data['location'],
                 'details' => $data['details'],
+                'luxuries' => $data['luxuries'],
                 // You can also add 'Additional_Notes', 'Travel', 'Managed_by', 'Added_by' as necessary
                 'added_by' => $agentId,
             ]);
             $rooms = $request->input('room_categories');
+            //dd($rooms);
             $images = $request->file('image');
             $room_images = $request->file('room_image');
+            $image_types = $request->input('image_type');
+            $imageCat=ImageCategory::where('image_type','Hotel')->first();
+            $i=0;
             foreach ($images as $image) {
                 if ($image->isValid()) {
                     $imageName = time() . '_' . $image->getClientOriginalName();
                     $image->move(storage_path('app/public/images'), $imageName);
-
                     $agentImage = new AgentImage();
                     $agentImage->type_id     = $agentHotel->id;
-                    $agentImage->category_id = 1;
+                    $agentImage->category_id = $imageCat->id;
+                    $agentImage->image_type= $image_types[$i]??NULL;
+                    $i++;
                     $agentImage->image = 'agent_images/' . $imageName;
                     $agentImage->save();
                 }
             }
+            $i=0;
+            $imageCat=ImageCategory::where('image_type','Room')->first();
+            $image_types = $request->input('room_image_type');
             foreach ($room_images as $image) {
                 if ($image->isValid()) {
                     $imageName = time() . '_' . $image->getClientOriginalName();
                     $image->move(storage_path('app/public/images'), $imageName);
-
                     $agentImage = new AgentImage();
                     $agentImage->type_id     = $agentHotel->id;
-                    $agentImage->category_id = 2;
-
+                    $agentImage->category_id = $imageCat->id;
+                    $agentImage->image_type= $image_types[$i]??NULL;
+                    $i++;
                     $agentImage->image = 'agent_images/' . $imageName;
                     $agentImage->save();
                 }
             }
-            for ($i = 0; $i < count($rooms); $i++) {
+          //  dd($rooms[1]);
+            $i=0;
+            foreach ($rooms as $room) {
                 $room = new RoomBooking();
                 $room->room_hotel_id = $agentHotel->id;
-                $id = RoomCategory::where('name', $rooms[$i])->pluck('id')->first();
-                $room->room_category_id = $id;
+//                dd($rooms);
+                $rid = RoomCategory::where('name', $rooms[$i])->first();
+                $i++;
+//dd($rid->id);
+                $room->room_category_id = $rid->id;
                 $room->added_by = auth()->user()->id;
                 $room->save();
             }
@@ -804,10 +822,18 @@ public function updateTransportation(Request $request){
     }
     public function getHotels()
     {
+        $data = AgentHotel::with('getImages')->with('getRoomImages')->with('getRooms')->get();
+        $record  = [];
+        foreach($data as $d )
+        {
+            $record[]= $d->getdata();
+        }
+
         return response()->json([
             'code' => 200,
             'message' => 'Hotels fetched successfully',
-            'hotels' =>  AgentHotel::with('getImages')->get()
+            'hotels' =>  $record,
+
         ], 200);
     }
     /*
