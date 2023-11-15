@@ -28,12 +28,12 @@ class ContentController extends Controller
                 $Specialcases=Content::where('content_id' , 10 )->first();
                 return response()->json([
                     'code' => 200,
-                    'message' => 'Terms fetched successfully',
-                    'General'=>$General,
-                    'Refunds'=>$Refunds,
-                    'Cancellation by the customer'=>$Cancellationbythecustomer,
-                    'Assisted refund'=>$Assistedrefund,
-                    'Special cases'=>$Specialcases,
+                    'message' => 'Cancellation fetched successfully',
+                    'general'=>$General,
+                    'refunds'=>$Refunds,
+                    'cancellation_by_the_customer'=>$Cancellationbythecustomer,
+                    'assisted_refund'=>$Assistedrefund,
+                    'special_cases'=>$Specialcases,
                 ], 200);
             } else {
                 return response()->json([
