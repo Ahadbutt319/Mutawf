@@ -382,14 +382,12 @@ public function updateTransportation(Request $request){
             'manage_by' => 'required|string',
             'images' => 'required|array|min:1|max:2',
         ];
-
         // Create a validator instance
         $validation = Validator::make($data, $rules);
 
         if ($validation->fails()) {
             return ResponseService::validationErrorResponse($validation->errors()->first());
         } else {
-
             $visa = AgentVisa::create([
                 'visa' => $data['visa'],
                 'duration' => $data['duration'],
@@ -570,7 +568,7 @@ public function updateTransportation(Request $request){
             'image.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // Adjust validation rules as needed
             ' .*' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // Adjust validation rules as needed
             //'reference_number' => 'required|string',
-            'room_categories' => 'required|array',
+            'room_categories' => 'required',
         ]);
 
 
@@ -588,6 +586,7 @@ public function updateTransportation(Request $request){
                 'added_by' => $agentId,
             ]);
             $rooms = $request->input('room_categories');
+          
             $images = $request->file('image');
             $room_images = $request->file('room_image');
             foreach ($images as $image) {
@@ -619,6 +618,7 @@ public function updateTransportation(Request $request){
                 $room = new RoomBooking();
                 $room->room_hotel_id = $agentHotel->id;
                 $id = RoomCategory::where('name', $rooms[$i])->pluck('id')->first();
+               
                 $room->room_category_id = $id;
                 $room->added_by = auth()->user()->id;
                 $room->save();
@@ -636,6 +636,7 @@ public function updateTransportation(Request $request){
             'additional_Notes' => 'string',
             'managed_by' => 'required',
             'status' => 'required',
+
             'image' => 'required|array|min:2|max:3',
             'image.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // Adjust validation rules as needed
         ]);

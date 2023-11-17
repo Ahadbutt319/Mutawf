@@ -18,4 +18,8 @@ class AgentHotel extends Model
    public function getImages(){
     return $this->hasMany(AgentImage::class,'type_id')->where('category_id',2);
 }
+public function umrahPackages()
+{
+    return $this->belongsToMany(UmrahPackage::class, 'hotel_package', 'package_id', 'hotel_id');
+} 
 }

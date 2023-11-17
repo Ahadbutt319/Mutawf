@@ -12,6 +12,12 @@ class PackageBooking extends Model
         'user_id',
         'package_id',
         'payment_status',
+        'date',
+        'payment_id',
+        'to',
+        'from',
+        'quantity',
+        'total_amount',
     ];
     public function packages()
     {
@@ -21,9 +27,19 @@ class PackageBooking extends Model
     {
            $data['id'] = $this->id;
            $data['User'] = User::where('id',$this->user_id )->value('name');
-           $data['package'] = AgentPackage::where('id',$this->package_id)->get();
+           $data['package'] = UmrahPackage::where('id',$this->package_id)->get();
+           $data['persons'] = $this->package_persons;
+           $data['visas'] = $this->visas;
            $data['createdAt'] = date(config("app.date_format"), strtotime($this->created_at));
             return $data;
+    }
+    public function visas()
+    {
+        return $this->hasMany(Visa::class,'booking_id');
+    }
+    public function package_persons()
+    {
+        return $this->hasMany(PackageBookedPerson::class,'booking_id');
     }
 
 }
