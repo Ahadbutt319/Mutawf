@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             RolesSeeder::class,
+            RoomCategory::class,
             CountriesSeeder::class,
             LanguagesSeeder::class,
             CurrenciesSeader::class,

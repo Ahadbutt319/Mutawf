@@ -79,6 +79,8 @@ Route::group(['middleware' => ['local']], function () {
         route::post('/delete-operator', [AgentController::class, 'deleteOperator']);
         route::post('/update-package',[AgentController::class,'updatePackage']);
         route::post('/update-operator',[AgentController::class,'updateOperator']);
+        route::post('/add-groundService',[AgentController::class,'addGroundServices']);
+        route::post('/groundService',[AgentController::class,'getGroundServices']);
         route::post('/update-visa',[AgentController::class,'updateVisa']);
         route::post('/update-transportation',[AgentController::class,'updateTransportation']);
         route::post('/add-card', [UserCardController::class, 'create']);
@@ -99,6 +101,7 @@ Route::group(['middleware' => ['local']], function () {
             route::post('/reach-us', [CustomerController::class, 'contactus']);
             route::get('/faqs', [FaqsController::class, 'index']);
             route::get('/content', [ContentController::class, 'index']);
+            route::get('/cancellation', [ContentController::class, 'cancellation']);
             route::get('/complain-types', [ComplainTypeController::class, 'index']);
         });
         // All admin  routes

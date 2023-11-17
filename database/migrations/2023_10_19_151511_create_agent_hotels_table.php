@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('hotel_name');
             $table->string('private_transport');
             $table->string('location');
+            $table->string('luxuries');
             $table->text('details');
             $table->foreignId('added_by')->constrained('users')->nullable;
             $table->timestamps();
