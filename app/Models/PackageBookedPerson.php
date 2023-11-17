@@ -5,15 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class AgentPackageActivity extends Model
+class PackageBookedPerson extends Model
 {
-    protected $table = 'package_activities';
+    protected $table= 'package_booking_persons_details';
     use HasFactory;
     protected $fillable = [
         'name',
-        'description',
-        'image',
-        'user_id',
-        'package_id',
+        'email',
+        'phone',
+        'booking_id'
     ];
+
+
 }

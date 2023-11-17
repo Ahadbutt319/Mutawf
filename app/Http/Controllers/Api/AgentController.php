@@ -418,14 +418,12 @@ public function updateTransportation(Request $request){
             'manage_by' => 'required|string',
             'images' => 'required|array|min:1|max:2',
         ];
-
         // Create a validator instance
         $validation = Validator::make($data, $rules);
 
         if ($validation->fails()) {
             return ResponseService::validationErrorResponse($validation->errors()->first());
         } else {
-
             $visa = AgentVisa::create([
                 'visa' => $data['visa'],
                 'duration' => $data['duration'],
@@ -607,9 +605,13 @@ public function updateTransportation(Request $request){
             'image.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // Adjust validation rules as needed
             ' .*' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // Adjust validation rules as needed
             //'reference_number' => 'required|string',
+
+            'room_categories' => 'required',
+
             'room_categories' => 'required|array',
             'image_type'=>'required|array',
             'room_image_type'=>'required|array'
+
 
         ]);
 
@@ -629,7 +631,6 @@ public function updateTransportation(Request $request){
                 'added_by' => $agentId,
             ]);
             $rooms = $request->input('room_categories');
-            //dd($rooms);
             $images = $request->file('image');
             $room_images = $request->file('room_image');
             $image_types = $request->input('image_type');
@@ -669,11 +670,17 @@ public function updateTransportation(Request $request){
             foreach ($rooms as $room) {
                 $room = new RoomBooking();
                 $room->room_hotel_id = $agentHotel->id;
-//                dd($rooms);
+
+                $id = RoomCategory::where('name', $rooms[$i])->pluck('id')->first();
+               
+                $room->room_category_id = $id;
+
+
                 $rid = RoomCategory::where('name', $rooms[$i])->first();
                 $i++;
 //dd($rid->id);
                 $room->room_category_id = $rid->id;
+
                 $room->added_by = auth()->user()->id;
                 $room->save();
             }
@@ -690,6 +697,7 @@ public function updateTransportation(Request $request){
             'additional_Notes' => 'string',
             'managed_by' => 'required',
             'status' => 'required',
+
             'image' => 'required|array|min:2|max:3',
             'image.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // Adjust validation rules as needed
         ]);
