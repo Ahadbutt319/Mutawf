@@ -15,13 +15,14 @@ use App\Http\Controllers\Api\CompanyController;
 use App\Http\Controllers\Api\ContentController;
 use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\LanguageController;
-use App\Http\Controllers\Api\superadmin\ComplainController;
 use App\Http\Controllers\Api\UserCardController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\api\UmrahPackageController;
 use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Api\TermAndConditionController;
+use App\Http\Controllers\Api\superadmin\ComplainController;
 use App\Http\Controllers\Api\superadmin\SuperadmiController;
 use App\Http\Controllers\Api\superadmin\ComplainTypeController;
 
@@ -35,10 +36,6 @@ use App\Http\Controllers\Api\superadmin\ComplainTypeController;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-
-
-
-
 
 route::post('/search-location', [HotelController::class, 'searchLocation']);
 route::post('/search-Hotel', [HotelController::class, 'getGeoId']);
@@ -68,7 +65,7 @@ Route::group(['middleware' => ['local']], function () {
     Route::group(['middleware' => ['auth:api', 'last_seen']], function () {
         route::get('/get-operators', [AgentController::class, 'getOperators']);
         route::post('/become-operator', [AgentController::class, 'becomeAnOperator']);
-        route::post('/create-package', [AgentController::class, 'addPackage']);
+        route::post('/create-package', [UmrahPackageController::class, 'create']);
         route::get('/packages', [AgentController::class, 'getGeneralPackage']);
         route::post('/add-hotels', [AgentController::class, 'addHotel']);
         route::get('/get-hotels', [AgentController::class, 'getHotels']);
@@ -96,9 +93,9 @@ Route::group(['middleware' => ['local']], function () {
         Route::post('/companies', [CompanyController::class, 'store']);
         //  ALL Customer routes
         Route::group(['prefix' => 'customer'], function () {
-            route::get('/packages', [CustomerController::class, 'getpackages']);
-            route::post('/package', [CustomerController::class, 'detailpackage']);
-            route::post('/serach/packages', [CustomerController::class, 'searchpackage']);
+            route::get('/packages', [UmrahPackageController::class, 'index']);
+            route::post('/package', [UmrahPackageController::class, 'detailpackage']);
+            route::post('/serach/packages', [UmrahPackageController::class, 'searchpackage']);
             route::post('/book/package', [CustomerController::class, 'packagebooking']);
             route::get('/all-bookings', [CustomerController::class, 'getbookings']);
             route::post('/reach-us', [CustomerController::class, 'contactus']);

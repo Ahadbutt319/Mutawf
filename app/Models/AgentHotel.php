@@ -54,4 +54,8 @@ for($i= 0; $i < count($array); $i++)
 $data['roomdata'] =$array_1;
 return $data;
 }
+public function umrahPackages()
+{
+    return $this->belongsToMany(UmrahPackage::class, 'hotel_package', 'package_id', 'hotel_id');
+} 
 }
