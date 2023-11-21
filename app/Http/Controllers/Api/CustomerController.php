@@ -47,10 +47,35 @@ class CustomerController extends Controller
             if ($user->role->role === 'customer') {
                
                 $data  = $request->data;
+            
                 $get_price =  UmrahPackage::where('id', $data['package_id'])->pluck('price')->first();
                 $total_amount = $data['quantity'] * $get_price;
                 //if customer have visa already 
                 if ($data['visa_status'] == 1) {
+
+
+                    $validator = Validator::make($request->all(), [
+                        'data.package_id' => 'required|exists:umrah_packages,id',
+                        'data.from' => 'required|string',
+                        'data.date' => 'required|date',
+                        'data.quantity' => 'required|integer|min:1',
+                        'data.to' => 'required|string',
+                        'data.payment_status' => 'required|boolean',
+                        'data.visa_status' => 'required|boolean',
+                        'data.persons' => 'required|array|min:1',
+                        'data.persons.*.email' => 'required|email',
+                        'data.persons.*.phone' => 'required|string',
+                        'data.persons.*.name' => 'required|string',
+                        'data.visas' => 'required_if:data.visa_status,1|array|min:1',
+                        'data.visas.*.passport_number' => 'required_if:data.visa_status,1|string',
+                        'data.visas.*.id_number' => 'required_if:data.visa_status,1|string',
+                        'data.visas.*.visa_number' => 'required_if:data.visa_status,1|string',
+                    ]);
+                
+                    if ($validator->fails()) {
+                        return response()->json(['errors' => $validator->errors()], 422);
+                    }
+                
                     $booking =  PackageBooking::create([
                         'user_id' => $id,
                         "package_id" => $data['package_id'],
@@ -81,6 +106,27 @@ class CustomerController extends Controller
                 }
                 // if they dont have visa and aplly for visa at same time
                 else {
+                    $validator = Validator::make($request->all(), [
+                        'data.package_id' => 'required|exists:umrah_packages,id',
+                        'data.from' => 'required|string',
+                        'data.date' => 'required|date',
+                        'data.quantity' => 'required|integer|min:1',
+                        'data.to' => 'required|string',
+                        'data.payment_status' => 'required|boolean',
+                        'data.visa_status' => 'required|boolean',
+                        'data.persons' => 'required|array|min:1',
+                        'data.persons.*.email' => 'required|email',
+                        'data.persons.*.phone' => 'required|string',
+                        'data.persons.*.name' => 'required|string',
+                        'data.visas' => 'required_if:data.visa_status,1|array|min:1',
+                        'data.visas.*.passport_number' => 'required_if:data.visa_status,1|string',
+                        'data.visas.*.id_number' => 'required_if:data.visa_status,1|string',
+                        'data.visas.*.visa_number' => 'required_if:data.visa_status,1|string',
+                    ]);
+                
+                    if ($validator->fails()) {
+                        return response()->json(['errors' => $validator->errors()], 422);
+                    }
                     $booking =  PackageBooking::create([
                         'user_id' => $id,
                         "package_id" => $data['package_id'],

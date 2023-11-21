@@ -2,13 +2,17 @@
 
 namespace App\Http\Controllers\api;
 
+use Carbon\Carbon;
 use App\Models\Room;
 use App\Models\User;
 use App\Models\Agents;
+use Faker\Core\Number;
 use App\Models\Operator;
 use App\Models\AgentVisa;
+use App\Models\RoomImage;
 use App\Models\AgentHotel;
 use App\Models\AgentImage;
+use App\Models\HotelImage;
 use App\Models\PackageKey;
 use App\Models\RoomBooking;
 use App\Models\AgentPackage;
@@ -16,6 +20,7 @@ use App\Models\RoomCategory;
 use Illuminate\Http\Request;
 use App\Models\GroundService;
 use App\Models\ImageCategory;
+use phpseclib3\System\SSH\Agent;
 use App\Services\ResponseService;
 use App\Models\AgentTransportation;
 use App\Http\Controllers\Controller;
@@ -26,137 +31,137 @@ class AgentController extends Controller
 {
 
 
-public function addGroundServices(Request $request){
-
-    $data = $request->All();
-    $validation = validator::make($data, [
-        'hotels' => 'required|string|exists:AgentHotel,hotel_name',
-        'guider_name' => 'required|string',
-        'tour_location' => 'string',
-        'services' => 'required|exists:AgentServices,name',// Adjust validation rules as needed
-    ]);
-
-    if ($validation->fails()) {
-        return ResponseService::validationErrorResponse($validation->errors()->first());
-    }
-     else {
-        $agentId = User::where('id', auth()->user()->id)->pluck('id')->first();
-        $groundService = new GroundService;
-        $groundService->added_by = $agentId;
-        $groundService->hotels = $data['hotels'];
-        $groundService->guider_name = $data['guider_name'];
-        $groundService->tour_location = $data['tour_location'];
-        $groundService->services = $data['services'];
-        $groundService->save();
-        return ResponseService::successResponse('You Service is Added Successfully !', $groundService);
-    }
-
-}
-
-public function getGroundServices(){
-    return response()->json([
-        'code' => 200,
-        'message' => 'GroundServices fetched successfully',
-        'packages' =>  GroundService::All()
-    ], 200);
-}
-
-
-
-public function updateTransportation(Request $request){
-    $data=$request->all();
-    $rules = [
-        'id'=>'required',
-        'type' => 'nullable|string',
-        'availability' => 'nullable|string',
-        'location' => 'nullable|string',
-        'pickup' => 'nullable|string',
-        'no_of_persons' => 'nullable|integer',
-        'manage_by' => 'nullable|string',
-        'tags' => 'nullable|string',
-        'image' => 'nullable|array|min:1',
-        'image.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
-    ];
-
-    // Create a validator instance
-    $validation = Validator::make($data, $rules);
-
-    if($validation->fails())
+    public function addGroundServices(Request $request)
     {
-    return ResponseService::validationErrorResponse($validation->errors()->first());
+
+        $data = $request->All();
+        $validation = validator::make($data, [
+            'hotels' => 'required|string|exists:AgentHotel,hotel_name',
+            'guider_name' => 'required|string',
+            'tour_location' => 'string',
+            'services' => 'required|exists:AgentServices,name', // Adjust validation rules as needed
+        ]);
+
+        if ($validation->fails()) {
+            return ResponseService::validationErrorResponse($validation->errors()->first());
+        } else {
+            $agentId = User::where('id', auth()->user()->id)->pluck('id')->first();
+            $groundService = new GroundService;
+            $groundService->added_by = $agentId;
+            $groundService->hotels = $data['hotels'];
+            $groundService->guider_name = $data['guider_name'];
+            $groundService->tour_location = $data['tour_location'];
+            $groundService->services = $data['services'];
+            $groundService->save();
+            return ResponseService::successResponse('You Service is Added Successfully !', $groundService);
+        }
     }
-    else{
 
-        $transportation = AgentTransportation::where('id',$data['id'])->first();
-
-        $data ;
-
-        // Check each field and update it if it's not empty
-        if ($request->filled('type')) {
-            $data['type'] = $request->input('type');
-        }
-
-        if ($request->filled('availability')) {
-            $data['availability'] = $request->input('availability');
-        }
-
-        if ($request->filled('location')) {
-            $data['location'] = $request->input('location');
-        }
-
-        if ($request->filled('pickup')) {
-            $data['pickup'] = $request->input('pickup');
-        }
-
-        if ($request->filled('no_of_persons')) {
-            $data['no_of_persons'] = $request->input('no_of_persons');
-        }
-
-        if ($request->filled('manage_by')) {
-            $data['manage_by'] = $request->input('manage_by');
-        }
-
-        if ($request->filled('tags')) {
-            $data['tags'] = $request->input('tags');
-        }
-
-        // Handle image uploads if provided
-        if ($request->has('image')) {
-            $images=$request->file('image');
-            $category=ImageCategory::where('image_type','Transportation')->pluck('id')->first();
-            foreach ($images as $image) {
-                if ($image->isValid()) {
-
-                    $imagePath = $image->move('public/images'); // Store the image file
-
-                    $imageUrl = asset(str_replace('public', 'storage', $imagePath)); // Generate the image URL
+    public function getGroundServices()
+    {
+        return response()->json([
+            'code' => 200,
+            'message' => 'GroundServices fetched successfully',
+            'packages' =>  GroundService::All()
+        ], 200);
+    }
 
 
-                    $agentImage = new AgentImage();
-                    $agentImage->type_id= $transportation->id;
-                    $agentImage->category_id= $category;
-                    $agentImage->image =$imageUrl;
-                    $agentImage->save();
+
+    public function updateTransportation(Request $request)
+    {
+        $data = $request->all();
+        $rules = [
+            'id' => 'required',
+            'type' => 'nullable|string',
+            'availability' => 'nullable|string',
+            'location' => 'nullable|string',
+            'pickup' => 'nullable|string',
+            'no_of_persons' => 'nullable|integer',
+            'manage_by' => 'nullable|string',
+            'tags' => 'nullable|string',
+            'image' => 'nullable|array|min:1',
+            'image.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+        ];
+
+        // Create a validator instance
+        $validation = Validator::make($data, $rules);
+
+        if ($validation->fails()) {
+            return ResponseService::validationErrorResponse($validation->errors()->first());
+        } else {
+
+            $transportation = AgentTransportation::where('id', $data['id'])->first();
+
+            $data;
+
+            // Check each field and update it if it's not empty
+            if ($request->filled('type')) {
+                $data['type'] = $request->input('type');
+            }
+
+            if ($request->filled('availability')) {
+                $data['availability'] = $request->input('availability');
+            }
+
+            if ($request->filled('location')) {
+                $data['location'] = $request->input('location');
+            }
+
+            if ($request->filled('pickup')) {
+                $data['pickup'] = $request->input('pickup');
+            }
+
+            if ($request->filled('no_of_persons')) {
+                $data['no_of_persons'] = $request->input('no_of_persons');
+            }
+
+            if ($request->filled('manage_by')) {
+                $data['manage_by'] = $request->input('manage_by');
+            }
+
+            if ($request->filled('tags')) {
+                $data['tags'] = $request->input('tags');
+            }
+
+            // Handle image uploads if provided
+            if ($request->has('image')) {
+                $images = $request->file('image');
+                $category = ImageCategory::where('image_type', 'Transportation')->pluck('id')->first();
+                foreach ($images as $image) {
+                    if ($image->isValid()) {
+
+                        $imagePath = $image->move('public/images'); // Store the image file
+
+                        $imageUrl = asset(str_replace('public', 'storage', $imagePath)); // Generate the image URL
+
+
+                        $agentImage = new AgentImage();
+                        $agentImage->type_id = $transportation->id;
+                        $agentImage->category_id = $category;
+                        $agentImage->image = $imageUrl;
+                        $agentImage->save();
+                    }
                 }
             }
+
+            $transportation->update($data);
         }
-
-        $transportation->update($data);
-}
-        return ResponseService::successResponse('Transportation is updated successfully !',$transportation );
-}
+        return ResponseService::successResponse('Transportation is updated successfully !', $transportation);
+    }
 
 
 
-    public function updateVisa(Request $request){
-        $data=$request->all();
+    public function updateVisa(Request $request)
+    {
+        $data = $request->all();
         $rules = [
-            'id'=>'required',
+            'id' => 'required',
             'visa' => 'nullable|string',
             'duration' => 'nullable|string',
             'visa_to' => 'nullable|string',
             'immigration' => 'nullable|string',
-            'validity'=>'nullable|string',
+            'validity' => 'nullable|string',
             'manage_by' => 'nullable|string',
             'images' => 'nullable|array|min:1|max:2',
         ];
@@ -164,13 +169,11 @@ public function updateTransportation(Request $request){
         // Create a validator instance
         $validation = Validator::make($data, $rules);
 
-        if($validation->fails())
-        {
-        return ResponseService::validationErrorResponse($validation->errors()->first());
-        }
-        else{
+        if ($validation->fails()) {
+            return ResponseService::validationErrorResponse($validation->errors()->first());
+        } else {
 
-            $visa = AgentVisa::where('id',$data['id'])->first();
+            $visa = AgentVisa::where('id', $data['id'])->first();
 
             // Create an array to store the data to update
             $data;
@@ -203,37 +206,35 @@ public function updateTransportation(Request $request){
             // Handle image uploads if provided
             if ($request->has('images')) {
 
-        $images=$request->file('images');
-        $category=ImageCategory::where('image_type','Visa')->pluck('id')->first();
-        foreach ($images as $image) {
-            if ($image->isValid()) {
+                $images = $request->file('images');
+                $category = ImageCategory::where('image_type', 'Visa')->pluck('id')->first();
+                foreach ($images as $image) {
+                    if ($image->isValid()) {
 
-                $imagePath = $image->move('public/images'); // Store the image file
+                        $imagePath = $image->move('public/images'); // Store the image file
 
-                $imageUrl = asset(str_replace('public', 'storage', $imagePath)); // Generate the image URL
+                        $imageUrl = asset(str_replace('public', 'storage', $imagePath)); // Generate the image URL
 
 
-                $agentImage = new AgentImage();
-                $agentImage->type_id= $visa->id;
-                $agentImage->category_id= $category;
-                $agentImage->image =$imageUrl;
-                $agentImage->save();
+                        $agentImage = new AgentImage();
+                        $agentImage->type_id = $visa->id;
+                        $agentImage->category_id = $category;
+                        $agentImage->image = $imageUrl;
+                        $agentImage->save();
+                    }
+                }
             }
-
-        }
-
-    }
             $visa->update($data);
-}
-            return ResponseService::successResponse('Visa is updated successfully !',$visa );
-
+        }
+        return ResponseService::successResponse('Visa is updated successfully !', $visa);
     }
 
 
 
 
-    public function updateOperator(Request $request){
-        $data=$request->all();
+    public function updateOperator(Request $request)
+    {
+        $data = $request->all();
         $rules = [
             'name' => 'nullable|string',
             'phone' => 'nullable|string',
@@ -247,13 +248,11 @@ public function updateTransportation(Request $request){
         // Create a validator instance
         $validation = Validator::make($data, $rules);
 
-        if($validation->fails())
-        {
-        return ResponseService::validationErrorResponse($validation->errors()->first());
-        }
-        else{
+        if ($validation->fails()) {
+            return ResponseService::validationErrorResponse($validation->errors()->first());
+        } else {
 
-            $operator = Operator::where('id',$data['id'])->first();
+            $operator = Operator::where('id', $data['id'])->first();
 
             // Create an array to store the data to update
             $data;
@@ -286,8 +285,8 @@ public function updateTransportation(Request $request){
             // Handle image uploads if provided
             if ($request->has('images')) {
 
-                $images=$request->file('images');
-                $category=ImageCategory::where('image_type','Operator')->pluck('id')->first();
+                $images = $request->file('images');
+                $category = ImageCategory::where('image_type', 'Operator')->pluck('id')->first();
                 foreach ($images as $image) {
                     if ($image->isValid()) {
 
@@ -297,9 +296,9 @@ public function updateTransportation(Request $request){
 
 
                         $agentImage = new AgentImage();
-                        $agentImage->type_id= $operator->id;
-                        $agentImage->category_id= $category;
-                        $agentImage->image =$imageUrl;
+                        $agentImage->type_id = $operator->id;
+                        $agentImage->category_id = $category;
+                        $agentImage->image = $imageUrl;
                         $agentImage->save();
                     }
                 }
@@ -307,100 +306,96 @@ public function updateTransportation(Request $request){
 
             // Update the Operator data
             $operator->update($data);
-
-            }
-            return ResponseService::successResponse('Your information is updated successfully !',$operator );
-
+        }
+        return ResponseService::successResponse('Your information is updated successfully !', $operator);
     }
 
-    public function updatePackage(Request $request){
+    public function updatePackage(Request $request)
+    {
 
-        $data=$request->all();
+        $data = $request->all();
 
-        $rules=[
-            'id'=>'required',
-            'package_name'=>'nullable|string',
-            'duration'=>'nullable|string',
-            'details'=>'nullable|string',
-            'additional_Notes'=>'string',
-            'managed_by'=>'nullable',
-            'status'=>'nullable',
+        $rules = [
+            'id' => 'required',
+            'package_name' => 'nullable|string',
+            'duration' => 'nullable|string',
+            'details' => 'nullable|string',
+            'additional_Notes' => 'string',
+            'managed_by' => 'nullable',
+            'status' => 'nullable',
             'image' => 'nullable|array|min:2|max:3',
             'image.*' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Adjust
         ];
-        $validator=validator::make($data,$rules);
+        $validator = validator::make($data, $rules);
 
         if ($validator->fails()) {
             return ResponseService::validationErrorResponse($validator->errors()->first());
-        }
-
-        else{
+        } else {
             $data;
-            $package=AgentPackage::where('id',$data['id'])->first();
+            $package = AgentPackage::where('id', $data['id'])->first();
 
 
-         // Check each field and update it if it's not null
-    if ($request->filled('package_name')) {
-        $data['package_name'] = $request->input('package_name');
-    }
-
-    if ($request->filled('duration')) {
-        $data['duration'] = $request->input('duration');
-    }
-
-    if ($request->filled('details')) {
-        $data['details'] = $request->input('details');
-    }
-
-    if ($request->filled('additional_Notes')) {
-        $data['additional_Notes'] = $request->input('additional_Notes');
-    }
-
-    if ($request->filled('managed_by')) {
-        $data['managed_by'] = $request->input('managed_by');
-    }
-
-    if ($request->filled('status')) {
-        $data['status'] = $request->input('status');
-    }
-
-    $packageKeys=PackageKey::where('package',$data['id'])->first();
-
-    if(isset($data['visa'])){
-    $packageKeys->visa=true;
-    }
-    if(isset($data['travel'])){
-    $packageKeys->travel=true;
-    }
-    if(isset($data['hotel'])){
-    $packageKeys->hotel=true;
-    }
-    $packageKeys->update();
-    // Handle image uploads if provided
-    if ($request->has('image')) {
-
-        $images=$request->file('images');
-        $category=ImageCategory::where('image_type','Package')->pluck('id')->first();
-        foreach ($images as $image) {
-            if ($image->isValid()) {
-
-                $imagePath = $image->move('public/images'); // Store the image file
-
-                $imageUrl = asset(str_replace('public', 'storage', $imagePath)); // Generate the image URL
-
-
-                $agentImage = new AgentImage();
-                $agentImage->type_id= $package->id;
-                $agentImage->category_id= $category;
-                $agentImage->image =$imageUrl;
-                $agentImage->update();
+            // Check each field and update it if it's not null
+            if ($request->filled('package_name')) {
+                $data['package_name'] = $request->input('package_name');
             }
-        }
-    }
 
-                $package->update($data);
-                return ResponseService::successResponse('Package updated Successfully!',$package );
+            if ($request->filled('duration')) {
+                $data['duration'] = $request->input('duration');
+            }
 
+            if ($request->filled('details')) {
+                $data['details'] = $request->input('details');
+            }
+
+            if ($request->filled('additional_Notes')) {
+                $data['additional_Notes'] = $request->input('additional_Notes');
+            }
+
+            if ($request->filled('managed_by')) {
+                $data['managed_by'] = $request->input('managed_by');
+            }
+
+            if ($request->filled('status')) {
+                $data['status'] = $request->input('status');
+            }
+
+            $packageKeys = PackageKey::where('package', $data['id'])->first();
+
+            if (isset($data['visa'])) {
+                $packageKeys->visa = true;
+            }
+            if (isset($data['travel'])) {
+                $packageKeys->travel = true;
+            }
+            if (isset($data['hotel'])) {
+                $packageKeys->hotel = true;
+            }
+            $packageKeys->update();
+            // Handle image uploads if provided
+            if ($request->has('image')) {
+
+                $images = $request->file('images');
+                $category = ImageCategory::where('image_type', 'Package')->pluck('id')->first();
+                foreach ($images as $image) {
+                    if ($image->isValid()) {
+
+                        $imagePath = $image->move('public/images'); // Store the image file
+
+                        $imageUrl = asset(str_replace('public', 'storage', $imagePath)); // Generate the image URL
+
+
+                        $agentImage = new AgentImage();
+                        $agentImage->type_id = $package->id;
+                        $agentImage->category_id = $category;
+                        $agentImage->image = $imageUrl;
+                        $agentImage->update();
+                    }
+                }
+            }
+
+            $package->update($data);
+            return ResponseService::successResponse('Package updated Successfully!', $package);
         }
     }
 
@@ -453,6 +448,7 @@ public function updateTransportation(Request $request){
             return ResponseService::successResponse('Visa added Successfully!', $visa);
         }
     }
+    
     public function addTransportation(Request $request)
     {
         $data = $request->all();
@@ -507,6 +503,7 @@ public function updateTransportation(Request $request){
             return ResponseService::successResponse('Agent transportation record created successfully', $agentTransportation);
         }
     }
+
     public function addImageCategory(Request $request)
     {
         $data = $request->all();
@@ -525,6 +522,7 @@ public function updateTransportation(Request $request){
             return ResponseService::successResponse('Your Category Added');
         }
     }
+
     public function fetchOperators()
     {
         return response()->json([
@@ -533,6 +531,7 @@ public function updateTransportation(Request $request){
             'operators' => Operator::select('id', 'phone', 'email', 'name')->get()
         ], 200);
     }
+
     public function becomeAnOperator(Request $request)
     {
 
@@ -591,6 +590,7 @@ public function updateTransportation(Request $request){
             return ResponseService::successResponse('You are an operator now!', $operator);
         }
     }
+
     public function addHotel(Request $request)
     {
         $data = $request->all();
@@ -598,95 +598,62 @@ public function updateTransportation(Request $request){
             'hotel_name' => 'required|string',
             'private_transport' => 'required|string',
             'location' => 'required|string',
-            'luxuries'=>'required|string',
+            'luxuries' => 'required|string',
             'details' => 'required|string',
-            'image' => 'required|array|min:2|max:3',
-            'room_image' => 'required|array|min:2|max:3',
-            'image.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // Adjust validation rules as needed
-            ' .*' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // Adjust validation rules as needed
-            //'reference_number' => 'required|string',
-
-            'room_categories' => 'required',
-
-            'room_categories' => 'required|array',
-            'image_type'=>'required|array',
-            'room_image_type'=>'required|array'
-
-
         ]);
-
-
         if ($validation->fails()) {
             return ResponseService::validationErrorResponse($validation->errors()->first());
         } else {
-            $agentId = User::where('id', auth()->user()->id)->pluck('id')->first();
-
             $agentHotel = AgentHotel::create([
                 'hotel_name' => $data['hotel_name'],
                 'private_transport' => $data['private_transport'],
                 'location' => $data['location'],
                 'details' => $data['details'],
                 'luxuries' => $data['luxuries'],
-                // You can also add 'Additional_Notes', 'Travel', 'Managed_by', 'Added_by' as necessary
-                'added_by' => $agentId,
+                'checkin_time' => $data['checkin_time'],
+                'checkout_time' => $data['checkout_time'],
+                'is_active' => $data['is_active'],
+                'added_by' => auth()->user()->id,
             ]);
-            $rooms = $request->input('room_categories');
-            $images = $request->file('image');
-            $room_images = $request->file('room_image');
-            $image_types = $request->input('image_type');
-            $imageCat=ImageCategory::where('image_type','Hotel')->first();
-            $i=0;
-            foreach ($images as $image) {
-                if ($image->isValid()) {
-                    $imageName = time() . '_' . $image->getClientOriginalName();
-                    $image->move(storage_path('app/public/images'), $imageName);
-                    $agentImage = new AgentImage();
-                    $agentImage->type_id     = $agentHotel->id;
-                    $agentImage->category_id = $imageCat->id;
-                    $agentImage->image_type= $image_types[$i]??NULL;
-                    $i++;
-                    $agentImage->image = 'agent_images/' . $imageName;
-                    $agentImage->save();
-                }
+            foreach ($request->hotel_images as $image) {
+                // $imageName = time() . '_' . $image['image']->getClientOriginalName();
+                // dd( $imageName);
+                // $image->move(storage_path('app/public/images'), $imageName);
+                $hotel_image = HotelImage::create([
+                    'hotel_id' => $agentHotel->id,
+                    'image' =>  $image['image'],
+                    'image_type' =>   $image['image_type'],
+
+                ]);
             }
-            $i=0;
-            $imageCat=ImageCategory::where('image_type','Room')->first();
-            $image_types = $request->input('room_image_type');
-            foreach ($room_images as $image) {
-                if ($image->isValid()) {
-                    $imageName = time() . '_' . $image->getClientOriginalName();
-                    $image->move(storage_path('app/public/images'), $imageName);
-                    $agentImage = new AgentImage();
-                    $agentImage->type_id     = $agentHotel->id;
-                    $agentImage->category_id = $imageCat->id;
-                    $agentImage->image_type= $image_types[$i]??NULL;
-                    $i++;
-                    $agentImage->image = 'agent_images/' . $imageName;
-                    $agentImage->save();
+            foreach ($request->rooms as $room) {
+
+                $room_hotel = RoomBooking::create([
+                    'sku' => 'Room_' . uniqid(),
+                    'price_per_night' => $room['price_per_night'],
+                    'room_number' => $room['room_number'],
+                    'floor_number' => $room['floor_number'],
+                    'bed_type' => $room['bed_type'],
+                    'is_available' => $room['is_available'],
+                    'room_category_id' =>  $room['room_category_id'],
+                    "capacity" => $room['capacity'],
+                    "added_by" => auth()->user()->id,
+                    "room_hotel_id" =>  $agentHotel->id
+                ]);
+                foreach ($room['room_images'] as $room_image) {
+                    // $imageName = time() . '_' . $room_image['image']->getClientOriginalName();
+                    // $image->move(storage_path('app/public/images'), $imageName);
+                    $room_images = RoomImage::create([
+                        'room_id' => $room_hotel->id,
+                        'image' =>  $room_image['image'],
+                        'room_image_type' => $room_image['image_type'],
+                    ]);
                 }
-            }
-          //  dd($rooms[1]);
-            $i=0;
-            foreach ($rooms as $room) {
-                $room = new RoomBooking();
-                $room->room_hotel_id = $agentHotel->id;
-
-                $id = RoomCategory::where('name', $rooms[$i])->pluck('id')->first();
-               
-                $room->room_category_id = $id;
-
-
-                $rid = RoomCategory::where('name', $rooms[$i])->first();
-                $i++;
-//dd($rid->id);
-                $room->room_category_id = $rid->id;
-
-                $room->added_by = auth()->user()->id;
-                $room->save();
             }
             return ResponseService::successResponse('Your Hotel is Added Successfully !', $agentHotel);
         }
     }
+
     public function addPackage(Request $request)
     {
         $data = $request->All();
@@ -704,8 +671,7 @@ public function updateTransportation(Request $request){
 
         if ($validation->fails()) {
             return ResponseService::validationErrorResponse($validation->errors()->first());
-        }
-         else {
+        } else {
             $agentId = User::where('id', auth()->user()->id)->pluck('id')->first();
             $agentPackage = AgentPackage::create([
                 'package_name' => $data['package_name'],
@@ -728,7 +694,7 @@ public function updateTransportation(Request $request){
                 'description' => $data['activity_description'],
                 'user_id' => $agentId,
                 'package_id' => $agentPackage->id,
-                'image'=> $activityimageUrl,
+                'image' => $activityimageUrl,
 
             ]);
             $images = $request->file('image');
@@ -758,7 +724,7 @@ public function updateTransportation(Request $request){
                 $package->hotel = true;
             }
             $package->save();
-            return ResponseService::successResponse('You Package is Added Successfully !', $agentPackage,$packageactivities);
+            return ResponseService::successResponse('You Package is Added Successfully !', $agentPackage, $packageactivities);
         }
     }
 
@@ -781,10 +747,9 @@ public function updateTransportation(Request $request){
             return response()->json(['code' => 200, 'message' => 'Package Successfully deleted'], 200);
         };
     }
+
     public function deleteOperator(Request $request)
     {
-
-
         $data = $request->all();
         $validation = validator::make($data, [
             'id' => 'required|exists:operators,id',
@@ -803,38 +768,43 @@ public function updateTransportation(Request $request){
 
     public function deletePackage(Request $request)
     {
-
-        $data = $request->all();
-        $validation = validator::make($data, [
-            'id' => 'required|exists:agent_packages,id',
-        ]);
-        if ($validation->fails()) {
-            return ResponseService::validationErrorResponse($validation->errors()->first());
-        } else {
-
-            $delId = ImageCategory::where('image_type', 'Package')->first();
-            AgentImage::where("type_id", $data["id"])->where('category_id', $delId)->delete();
-            PackageKey::where("package", $data["id"])->delete();
-            AgentPackage::where('id', $data['id'])->delete();
-
-            return response()->json(['code' => 200, 'message' => 'Package Successfully deleted'], 200);
-        };
+        try {
+            $data = $request->all();
+            $validation = validator::make($data, [
+                'id' => 'required|exists:agent_packages,id',
+            ]);
+            if ($validation->fails()) {
+                return ResponseService::validationErrorResponse($validation->errors()->first());
+            } else {
+    
+                $delId = ImageCategory::where('image_type', 'Package')->first();
+                AgentImage::where("type_id", $data["id"])->where('category_id', $delId)->delete();
+                PackageKey::where("package", $data["id"])->delete();
+                AgentPackage::where('id', $data['id'])->delete();
+    
+                return response()->json(['code' => 200, 'message' => 'Package Successfully deleted'], 200);
+            };
+        } catch (\Throwable $th) {
+            return response()->json(['error' => $$th->getMessage(),]);
+        }
+      
     }
+
     public function getGeneralPackage()
-    {
+    {        
         return response()->json([
             'code' => 200,
             'message' => 'Packages fetched successfully',
             'packages' =>  AgentPackage::with('Keys')->with('packageactivites')->with('Images')->get()
         ], 200);
     }
+
     public function getHotels()
     {
-        $data = AgentHotel::with('getImages')->with('getRoomImages')->with('getRooms')->get();
+        $data = AgentHotel::with('hotel_images')->with('rooms.roomImages')->get();
         $record  = [];
-        foreach($data as $d )
-        {
-            $record[]= $d->getdata();
+        foreach ($data as $d) {
+            $record[] = $d->getdata();
         }
 
         return response()->json([
@@ -844,16 +814,66 @@ public function updateTransportation(Request $request){
 
         ], 200);
     }
-    /*
-    public function getPackages()
-    {
-        return response()->json([
-            'code'=>200,
-            'message'=>'Packages fetched successfully',
-            'packages' => AgentPackage::with('getImages')->get()
-        ], 200);
 
+    public function getHotelDetial(Request $request)
+    {
+        try {
+            $data = AgentHotel::where('id', $request->id)->with('hotel_images')->with('rooms.roomImages')->get();
+            return response()->json([
+                'code' => 200,
+                'message' => 'Hotel fetched successfully',
+                'hotels' =>  $data,
+
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json(['error' => $$th->getMessage(),]);
+        }
     }
 
-    */
+    public function searchHotel(Request $request)
+    {
+        try {
+            $query = AgentHotel::query();
+            // Name
+            if ($request->has('name')) {
+                $query->where('hotel_name', 'like', '%' . $request->input('name') . '%');
+            }
+            // Check-in and Check-out time range
+            if ($request->has('checkin_time') && $request->has('checkout_time')) {
+                $checkinTime = \Carbon\Carbon::parse($request->input('checkin_time'));
+                $checkoutTime = \Carbon\Carbon::parse($request->input('checkout_time'));
+
+                $query->where(function ($subQuery) use ($checkinTime, $checkoutTime) {
+                    $subQuery->whereBetween('checkin_time', [$checkinTime, $checkoutTime])
+                        ->orWhereBetween('checkout_time', [$checkinTime, $checkoutTime]);
+                });
+            } elseif ($request->has('checkin_time')) {
+                // Only Check-in time provided
+                $checkinTime = \Carbon\Carbon::parse($request->input('checkin_time'));
+                $query->where('checkin_time', '>=', $checkinTime);
+            } elseif ($request->has('checkout_time')) {
+                // Only Check-out time provided
+                $checkoutTime = \Carbon\Carbon::parse($request->input('checkout_time'));
+                $query->where('checkout_time', '<=', $checkoutTime);
+            }
+            // Persons
+            if ($request->has('persons')) {
+                $query->whereHas('rooms', function ($subQuery) use ($request) {
+                    $subQuery->where('capacity', '>=', $request->input('persons'));
+                });
+            }
+            // Location
+            if ($request->has('location')) {
+                $query->where('location', 'like', '%' . $request->input('location') . '%');
+            }
+            $results = $query->get();
+            // You can customize the returned data as per your requirements
+            $formattedResults = $results->map(function ($hotel) {
+                return $hotel->getdata();
+            });
+            return response()->json(['data' => $formattedResults], 200);
+        } catch (\Throwable $th) {
+            return response()->json(['error' => $$th->getMessage(),]);
+        }
+    }
 }

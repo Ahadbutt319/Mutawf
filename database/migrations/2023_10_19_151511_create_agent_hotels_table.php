@@ -15,10 +15,14 @@ return new class extends Migration
             $table->id();
             $table->string('hotel_name');
             $table->string('private_transport');
+            $table->datetime('checkin_time')->nullable();
+            $table->datetime('checkout_time')->nullable();
+            
+            $table->boolean('is_active')->default(true);
             $table->string('location');
             $table->string('luxuries');
             $table->text('details');
-            $table->foreignId('added_by')->constrained('users')->nullable;
+            $table->foreignId('added_by')->constrained('users')->nullable();
             $table->timestamps();
         });
     }
