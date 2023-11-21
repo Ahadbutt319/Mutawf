@@ -54,7 +54,7 @@ class UmrahPackageController extends Controller
                 return response()->json([
                     'code' => 200,
                     'message' => 'Package  Detail fetched successfully',
-                    'package_details' =>  UmrahPackage::where('id', $request->id)->with('hotels')->with('package_activities')->first()
+                    'package_details' =>  UmrahPackage::where('id', $request->id)->with(['hotels.hotel_images','hotels.rooms','hotels.rooms.roomImages' ])->with('package_activities')->first()
                 ], 200);
             }
             else{
