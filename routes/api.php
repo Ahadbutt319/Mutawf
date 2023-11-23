@@ -17,7 +17,7 @@ use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\LanguageController;
 use App\Http\Controllers\Api\UserCardController;
 use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\api\UmrahPackageController;
+use App\Http\Controllers\Api\UmrahPackageController;
 use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
