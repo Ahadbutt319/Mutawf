@@ -20,6 +20,7 @@ return new class extends Migration
             $table->dateTime('checkin_time')->nullable();
             $table->dateTime('checkout_time')->nullable();
             $table->foreignId('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->enum('status', ['pending', 'confirmed', 'in progress', 'cancelled']);
             $table->string('payment_id')->nullable();
             $table->dateTime('location')->nullable();
             $table->timestamps();

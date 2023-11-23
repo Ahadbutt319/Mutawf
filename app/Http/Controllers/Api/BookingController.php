@@ -20,7 +20,8 @@ class BookingController extends Controller
             "user_id"=> auth()->user()->id,
             'payment_id'=> $request->payment_id,
             'name'=> $request->name,
-            'email'=>$request->email
+            'email'=>$request->email,
+            'staus'=> 'pending'
         ]);
         return response()->json(['message' => 'Hotel booking created successfully', 'booking' => $hotelBooking]);   
 

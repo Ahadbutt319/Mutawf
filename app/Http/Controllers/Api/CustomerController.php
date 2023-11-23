@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\api;
 
+use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Visa;
 use App\Models\bookpackage;
@@ -13,6 +14,7 @@ use App\Mail\ReachusNotification;
 use App\Models\PackageBookedPerson;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class CustomerController extends Controller
@@ -39,91 +41,94 @@ class CustomerController extends Controller
     }
     public function packagebooking(Request $request)
     {
-       
-       
         try {
             $id = auth()->user()->id;
             $user = User::find($id);
             if ($user->role->role === 'customer') {
-               
-                $data  = $request->data;
-            
+
+                $data  = $request->all();
+
                 $get_price =  UmrahPackage::where('id', $data['package_id'])->pluck('price')->first();
                 $total_amount = $data['quantity'] * $get_price;
                 //if customer have visa already 
+
                 if ($data['visa_status'] == 1) {
-
-
                     $validator = Validator::make($request->all(), [
-                        'data.package_id' => 'required|exists:umrah_packages,id',
-                        'data.from' => 'required|string',
-                        'data.date' => 'required|date',
-                        'data.quantity' => 'required|integer|min:1',
-                        'data.to' => 'required|string',
-                        'data.payment_status' => 'required|boolean',
-                        'data.visa_status' => 'required|boolean',
-                        'data.persons' => 'required|array|min:1',
-                        'data.persons.*.email' => 'required|email',
-                        'data.persons.*.phone' => 'required|string',
-                        'data.persons.*.name' => 'required|string',
-                        'data.visas' => 'required_if:data.visa_status,1|array|min:1',
-                        'data.visas.*.passport_number' => 'required_if:data.visa_status,1|string',
-                        'data.visas.*.id_number' => 'required_if:data.visa_status,1|string',
-                        'data.visas.*.visa_number' => 'required_if:data.visa_status,1|string',
+                        'package_id' => 'required|exists:umrah_packages,id',
+                        'from' => 'required|string',
+                        'quantity' => 'required|integer|min:1',
+                        'to' => 'required|string',
+                        'payment_status' => 'required|boolean',
+                        'visa_status' => 'required|boolean',
                     ]);
-                
                     if ($validator->fails()) {
-                        return response()->json(['errors' => $validator->errors()], 422);
+                        return response()->json(['errors' => $data], 422);
                     }
-                
                     $booking =  PackageBooking::create([
                         'user_id' => $id,
                         "package_id" => $data['package_id'],
                         "from" => $data['from'],
-                        "date" => $data['date'],
-                        "quantity" =>$data['quantity'],
-                        "to" =>$data['to'],
+                        "date" => Carbon::now(), // Use Carbon::now() to get the current date and time
+                        "quantity" => $data['quantity'],
+                        "to" => $data['to'],
                         'payment_status' => $data['payment_status'],
                         "total_amount" => $total_amount,
                         "payment_id" => $data['payment_id'],
                     ]);
-                    foreach ($data['persons'] as $person) {
-                        $persons = PackageBookedPerson::create([
-                            "email" => $person['email'],
-                            "phone" => $person['phone'],
-                            "name" => $person['name'],
-                            "booking_id" => $booking->id
-                        ]);
+                    // this condition for mobile side devloper becasue they send us a json string so that we need to change this into array and perfor our task 
+                    if (is_string($data['persons']) && is_array(json_decode($data['persons'], true))) {
+                        $persons = json_decode($data['persons'], true);
+                        foreach ($persons as $person) {
+                            $persons = PackageBookedPerson::create([
+                                "email" => $person['email'],
+                                "phone" => $person['phone'],
+                                "name" => $person['name'],
+                                "booking_id" => $booking->id
+                            ]);
+                        }
+                    } else {
+                        foreach ($data['persons'] as $person) {
+                            $persons = PackageBookedPerson::create([
+                                "email" => $person['email'],
+                                "phone" => $person['phone'],
+                                "name" => $person['name'],
+                                "booking_id" => $booking->id
+                            ]);
+                        }
                     }
-                    foreach ($data['visas'] as $visa) {
-                        $visas = Visa::create([
-                            "passport_number" => $visa['passport_number'],
-                            "id_number" => $visa['id_number'],
-                            "visa_number" => $visa['visa_number'],
-                            "booking_id" => $booking->id
-                        ]);
+                    if (is_string($data['visas']) && is_array(json_decode($data['visas'], true))) {
+                        $visas = json_decode($data['visas'], true);
+
+                        foreach ($visas as $visa) {
+                            $visas = Visa::create([
+                                "passport_number" => $visa['passport_number'],
+                                "id_number" => $visa['id_number'],
+                                "visa_number" => $visa['visa_number'],
+                                "booking_id" => $booking->id
+                            ]);
+                        }
+                    } else {
+                        foreach ($data['visas'] as $visa) {
+                            $visas = Visa::create([
+                                "passport_number" => $visa['passport_number'],
+                                "id_number" => $visa['id_number'],
+                                "visa_number" => $visa['visa_number'],
+                                "booking_id" => $booking->id
+                            ]);
+                        }
                     }
                 }
                 // if they dont have visa and aplly for visa at same time
                 else {
                     $validator = Validator::make($request->all(), [
-                        'data.package_id' => 'required|exists:umrah_packages,id',
-                        'data.from' => 'required|string',
-                        'data.date' => 'required|date',
-                        'data.quantity' => 'required|integer|min:1',
-                        'data.to' => 'required|string',
-                        'data.payment_status' => 'required|boolean',
-                        'data.visa_status' => 'required|boolean',
-                        'data.persons' => 'required|array|min:1',
-                        'data.persons.*.email' => 'required|email',
-                        'data.persons.*.phone' => 'required|string',
-                        'data.persons.*.name' => 'required|string',
-                        'data.visas' => 'required_if:data.visa_status,1|array|min:1',
-                        'data.visas.*.passport_number' => 'required_if:data.visa_status,1|string',
-                        'data.visas.*.id_number' => 'required_if:data.visa_status,1|string',
-                        'data.visas.*.visa_number' => 'required_if:data.visa_status,1|string',
+                        'package_id' => 'required|exists:umrah_packages,id',
+                        'from' => 'required|string',
+                        'quantity' => 'required|integer|min:1',
+                        'to' => 'required|string',
+                        'payment_status' => 'required|boolean',
+                        'visa_status' => 'required|boolean',
                     ]);
-                
+
                     if ($validator->fails()) {
                         return response()->json(['errors' => $validator->errors()], 422);
                     }
@@ -131,32 +136,69 @@ class CustomerController extends Controller
                         'user_id' => $id,
                         "package_id" => $data['package_id'],
                         "from" => $data['from'],
-                        "date" => $data['date'],
-                        "quantity" =>$data['quantity'],
-                        "to" =>$data['to'],
+                        "date" => Carbon::now(), // Use Carbon::now() to get the current date and time
+                        "quantity" => $data['quantity'],
+                        "to" => $data['to'],
                         'payment_status' => $data['payment_status'],
                         "total_amount" => $total_amount,
                         "payment_id" => $data['payment_id'],
                     ]);
-                    foreach ($data['persons'] as $person) {
-                       
-                        $persons = PackageBookedPerson::create([
-                            "email" => $person['email'],
-                            "phone" => $person['phone'],
-                            "name" => $person['name'],
-                            "booking_id" => $booking->id
-                        ]);
+                    // this condition for mobile side devloper becasue they send us a json string so that we need to change this into array and perfor our task 
+                    if (is_string($data['persons']) && is_array(json_decode($data['persons'], true))) {
+                        $persons = json_decode($data['persons'], true);
+                        foreach ($persons as $person) {
+                            $persons = PackageBookedPerson::create([
+                                "email" => $person['email'],
+                                "phone" => $person['phone'],
+                                "name" => $person['name'],
+                                "booking_id" => $booking->id
+                            ]);
+                        }
+                    } else {
+                        foreach ($data['persons'] as $person) {
+                            $persons = PackageBookedPerson::create([
+                                "email" => $person['email'],
+                                "phone" => $person['phone'],
+                                "name" => $person['name'],
+                                "booking_id" => $booking->id
+                            ]);
+                        }
                     }
-                    foreach ($data['visas'] as $visa) {
-                        $visas = Visa::create([
-                            "passport_number" => $visa['passport_number'],
-                            "nationality" => $visa['nationality'],
-                            "id_number" => $visa['id_number'],
-                            "visa_number" => $visa['visa_number'],
-                            "photo" => $visa['photo'],
-                            "passport_image" => $visa['passport_image'],
-                            "booking_id" => $booking->id
-                        ]);
+                    if (is_string($data['visas']) && is_array(json_decode($data['visas'], true))) {
+                        $visas = json_decode($data['visas'], true);
+                        foreach ($visas as $visa) { 
+                            // Decode base64 to binary
+                             $passportImageData = base64_decode($visa['passport_image']);
+                            // Store binary data in storage
+                            $passportImagePath = 'passport_images/' . uniqid() . '.jpg';
+                            Storage::put($passportImagePath, $passportImageData);
+                            // Decode base64 to binary
+                            $passportPerosnphoto = base64_decode($visa['photo']);
+                            // Store binary data in storage
+                            $passportPerosnImagePath = 'passport_person_images/' . uniqid() . '.jpg';
+                            Storage::put($passportPerosnImagePath, $passportPerosnphoto);
+                             Visa::create([
+                                "passport_number" => $visa['passport_number'],
+                                "nationality" => $visa['nationality'],
+                                "id_number" => $visa['id_number'],
+                                "visa_number" => $visa['visa_number'],
+                                'photo' => $passportPerosnImagePath,
+                                "passport_image" => $passportImagePath,
+                                "booking_id" => $booking->id
+                            ]);
+                        }
+                    } else {
+                        foreach ($data['visas'] as $visa) {
+                            $visas = Visa::create([
+                                "passport_number" => $visa['passport_number'],
+                                "nationality" => $visa['nationality'],
+                                "id_number" => $visa['id_number'],
+                                "visa_number" => $visa['visa_number'],
+                                "photo" => $visa['photo'],
+                                "passport_image" => $visa['passport_image'],
+                                "booking_id" => $booking->id
+                            ]);
+                        }
                     }
                 }
                 $pivot =  bookpackage::create([
@@ -235,7 +277,6 @@ class CustomerController extends Controller
             return response()->json(['error' => $th->getMessage(), 'data' => null], 500);
         }
     }
-
     public function contactus(Request $request)
     {
         try {
