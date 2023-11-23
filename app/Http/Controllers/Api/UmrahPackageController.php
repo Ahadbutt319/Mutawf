@@ -51,10 +51,12 @@ class UmrahPackageController extends Controller
             $id = auth()->user()->id;
             $user = User::find($id);
             if ($user->role->role === 'customer' || $user->role->role === 'admin') {
+                $data =  UmrahPackage::where('id', $request->id)->with(['hotels.hotel_images','hotels.rooms','hotels.rooms.roomImages' ])->with('package_activities')->first();
+                    $records = $data->getDetailRecord();       
                 return response()->json([
                     'code' => 200,
                     'message' => 'Package  Detail fetched successfully',
-                    'package_details' =>  UmrahPackage::where('id', $request->id)->with('hotels')->with('package_activities')->first()
+                    'package_details' =>   $records
                 ], 200);
             }
             else{
@@ -158,43 +160,7 @@ class UmrahPackageController extends Controller
         }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreUmrahPackageRequest $request)
-    {
-        //
-    }
+   
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(UmrahPackage $umrahPackage)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(UmrahPackage $umrahPackage)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateUmrahPackageRequest $request, UmrahPackage $umrahPackage)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(UmrahPackage $umrahPackage)
-    {
-        //
-    }
+   
 }

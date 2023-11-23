@@ -111,7 +111,6 @@ return new class extends Migration
             $table->dropForeign(['booking_id']);
 
         });
-
         Schema::dropIfExists('visas');
         Schema::dropIfExists('package_booking_persons_details');
         Schema::dropIfExists('package_bookings');

@@ -17,7 +17,7 @@ use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\LanguageController;
 use App\Http\Controllers\Api\UserCardController;
 use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\Api\UmrahPackageController;
+use App\Http\Controllers\APi\UmrahPackageController;
 use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
@@ -25,6 +25,8 @@ use App\Http\Controllers\Api\TermAndConditionController;
 use App\Http\Controllers\Api\superadmin\ComplainController;
 use App\Http\Controllers\Api\superadmin\SuperadmiController;
 use App\Http\Controllers\Api\superadmin\ComplainTypeController;
+use App\Http\Controllers\Api\BookingController;
+use App\Http\Controllers\api\TransportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -69,10 +71,13 @@ Route::group(['middleware' => ['local']], function () {
         route::get('/packages', [AgentController::class, 'getGeneralPackage']);
         route::post('/add-hotels', [AgentController::class, 'addHotel']);
         route::get('/get-hotels', [AgentController::class, 'getHotels']);
+        route::post('/get-hotel', [AgentController::class, 'getHotelDetial']);
         route::post('/add-ImageCategory', [AgentController::class, 'addImageCategory']);
         route::post('/become-operator', [AgentController::class, 'becomeAnOperator']);
         route::get('/operators', [AgentController::class, 'fetchOperators']);
-        route::post('/add-transportation', [AgentController::class, 'addTransportation']);
+        // route::post('/add-transportation', [AgentController::class, 'addTransportation']);
+        Route::post('/add-transportation', [TransportController::class, 'create']);
+     
         route::post('/add-visa', [AgentController::class, 'addVisa']);
         route::post('/delete-visa', [AgentController::class, 'deleteVisa']);
         route::post('/delete-package', [AgentController::class, 'deletePackage']);
@@ -93,6 +98,14 @@ Route::group(['middleware' => ['local']], function () {
         Route::post('/companies', [CompanyController::class, 'store']);
         //  ALL Customer routes
         Route::group(['prefix' => 'customer'], function () {
+            route::get('/get-transport', [TransportController::class, 'index']);
+            Route::post('/book/transport', [TransportController::class, 'booking']);
+            Route::get('/booked/transport', [TransportController::class, 'getAllBooking']);
+            route::get('/get-hotels', [AgentController::class, 'getHotels']);
+            route::post('/hotel-detial', [AgentController::class, 'getHotelDetial']);
+            route::post('/search-hotel', [AgentController::class, 'searchHotel']);
+            route::post('/booking', [BookingController::class, 'booking']);
+            route::post('/get-bookings', [BookingController::class, 'getBookingDetails']);
             route::get('/packages', [UmrahPackageController::class, 'index']);
             route::post('/package', [UmrahPackageController::class, 'detailpackage']);
             route::post('/serach/packages', [UmrahPackageController::class, 'searchpackage']);

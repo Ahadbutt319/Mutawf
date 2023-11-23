@@ -13,8 +13,15 @@ return new class extends Migration
     {
         Schema::create('room_bookings', function (Blueprint $table) {
             $table->id();
+            $table->string('sku');
             $table->string('added_by');
             $table->foreignId('room_category_id')->references('id')->on('room_categories');
+            $table->string('price_per_night');
+            $table->string('room_number');
+            $table->string('floor_number');
+            $table->string('bed_type');
+            $table->boolean('is_available')->default(true);
+            $table->string('capacity');
             $table->foreignId('room_hotel_id')->references('id')->on('agent_hotels');
             $table->timestamps();
         });

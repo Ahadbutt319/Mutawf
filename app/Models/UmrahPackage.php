@@ -43,5 +43,42 @@ class UmrahPackage extends Model
            $data['createdAt'] = date(config("app.date_format"), strtotime($this->created_at));
            return $data;
     }
+    public function getDetailRecord()
+    {
+           $data['id'] = $this->id;
+           $data['sku'] = $this->sku;
+           $data['name'] = $this->name;
+           $data['details'] = $this->details;
+           $data['package_type'] = $this->type;
+           $data['managed_by'] = $this->managed_by;
+           $data['duration'] = $this->duration;
+           $data['person'] = $this->person;
+           $data['first_trip_start'] = $this->first_start;
+           $data['first_trip_end'] = $this->first_end;
+           $data['second_trip_start'] = $this->second_start;
+           $data['second_trip_end'] = $this->second_end;
+           $data['tags'] = $this->tags;
+           $data['transport'] = $this->transport;
+           $data['price'] = $this->price;
+           $data['package_status'] = $this->package_status;
+           $array_madina = [];
+           foreach ($this->hotels as $hotel) {
+            if ($hotel->location == 'Madina') {
+                $array_madina = $hotel;
+            }
+           $data['madina_hotel'] =   $array_madina;
+           $array_makkah = [];
+           foreach ($this->hotels as $hotel) {
+            if ($hotel->location == 'Makkah') {
+                $array_makkah = $hotel;
+            }
+            $data['makkah_hotel'] =   $array_makkah;
+           }
 
+           $data['createdAt'] = date(config("app.date_format"), strtotime($this->created_at));
+           return $data;
+    }
+
+
+}
 }
