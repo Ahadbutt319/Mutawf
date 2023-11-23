@@ -9,8 +9,10 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class TransportBooking extends Model
 {
-    use HasFactory;
 
+
+    protected $table = 'transportation_bookings';
+    use HasFactory;
     // translatable fields
     public $translatable = ['description'];
 
@@ -20,16 +22,22 @@ class TransportBooking extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'name',
+        'email',
+        'phone',
+        'passengers',
+        'luggages',
+        'details',
+        'type',
+        'pickup',
+        'drop_off',
+        'date',
+        'time',
+        'return_date',
+        'return_time',
+        'duration',
+        'transport_id',
         'user_id',
-        'seat_id',
-        'transportation_id',
-        'brn',
-        'status',
-        'description',
-        'departure_at',
-        'arrive_at',
-        'departure_status',
-        'arrival_status',
     ];
 
     /**
