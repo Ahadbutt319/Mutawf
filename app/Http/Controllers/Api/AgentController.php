@@ -815,10 +815,10 @@ class AgentController extends Controller
         ], 200);
     }
 
-    public function getHotelDetial(Request $request)
+    public function getHotelDetail(Request $request)
     {
         try {
-            $data = AgentHotel::where('id', $request->id)->with('hotel_images')->with('rooms.roomImages')->get();
+            $data = AgentHotel::where('id', $request->id)->with('hotel_images')->with('rooms.roomImages')->first();
             return response()->json([
                 'code' => 200,
                 'message' => 'Hotel fetched successfully',

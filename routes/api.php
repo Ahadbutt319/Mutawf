@@ -77,7 +77,7 @@ Route::group(['middleware' => ['local']], function () {
         route::get('/operators', [AgentController::class, 'fetchOperators']);
         // route::post('/add-transportation', [AgentController::class, 'addTransportation']);
         Route::post('/add-transportation', [TransportController::class, 'create']);
-     
+
         route::post('/add-visa', [AgentController::class, 'addVisa']);
         route::post('/delete-visa', [AgentController::class, 'deleteVisa']);
         route::post('/delete-package', [AgentController::class, 'deletePackage']);
@@ -102,7 +102,7 @@ Route::group(['middleware' => ['local']], function () {
             Route::post('/book/transport', [TransportController::class, 'booking']);
             Route::get('/booked/transport', [TransportController::class, 'getAllBooking']);
             route::get('/get-hotels', [AgentController::class, 'getHotels']);
-            route::post('/hotel-detial', [AgentController::class, 'getHotelDetial']);
+            route::post('/hotel-detail', [AgentController::class, 'getHotelDetail']);
             route::post('/search-hotel', [AgentController::class, 'searchHotel']);
             route::post('/booking', [BookingController::class, 'booking']);
             route::post('/get-bookings', [BookingController::class, 'getBookingDetails']);
