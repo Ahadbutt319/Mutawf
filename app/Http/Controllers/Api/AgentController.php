@@ -822,7 +822,7 @@ class AgentController extends Controller
             return response()->json([
                 'code' => 200,
                 'message' => 'Hotel fetched successfully',
-                'hotels' =>  $data,
+                'hotel-detail' =>  $data,
 
             ], 200);
         } catch (\Throwable $th) {
