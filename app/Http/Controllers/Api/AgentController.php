@@ -448,7 +448,7 @@ class AgentController extends Controller
             return ResponseService::successResponse('Visa added Successfully!', $visa);
         }
     }
-    
+
     public function addTransportation(Request $request)
     {
         $data = $request->all();
@@ -776,22 +776,22 @@ class AgentController extends Controller
             if ($validation->fails()) {
                 return ResponseService::validationErrorResponse($validation->errors()->first());
             } else {
-    
+
                 $delId = ImageCategory::where('image_type', 'Package')->first();
                 AgentImage::where("type_id", $data["id"])->where('category_id', $delId)->delete();
                 PackageKey::where("package", $data["id"])->delete();
                 AgentPackage::where('id', $data['id'])->delete();
-    
+
                 return response()->json(['code' => 200, 'message' => 'Package Successfully deleted'], 200);
             };
         } catch (\Throwable $th) {
             return response()->json(['error' => $$th->getMessage(),]);
         }
-      
+
     }
 
     public function getGeneralPackage()
-    {        
+    {
         return response()->json([
             'code' => 200,
             'message' => 'Packages fetched successfully',
@@ -871,7 +871,7 @@ class AgentController extends Controller
             $formattedResults = $results->map(function ($hotel) {
                 return $hotel->getdata();
             });
-            return response()->json(['data' => $formattedResults], 200);
+            return response()->json(['message'=>'Hotels fetched successfully','hotels' => $formattedResults], 200);
         } catch (\Throwable $th) {
             return response()->json(['error' => $$th->getMessage(),]);
         }
