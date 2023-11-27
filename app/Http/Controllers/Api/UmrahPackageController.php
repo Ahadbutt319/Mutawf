@@ -52,7 +52,7 @@ class UmrahPackageController extends Controller
             $user = User::find($id);
             if ($user->role->role === 'customer' || $user->role->role === 'admin') {
                 $data =  UmrahPackage::where('id', $request->id)->with(['hotels.hotel_images','hotels.rooms','hotels.rooms.roomImages' ])->with('package_activities')->first();
-                    $records = $data->getDetailRecord();       
+                    $records = $data->getDetailRecord();
                 return response()->json([
                     'code' => 200,
                     'message' => 'Package  Detail fetched successfully',
@@ -82,7 +82,7 @@ class UmrahPackageController extends Controller
                 return response()->json([
                     'code' => 200,
                     'message' => 'Packages fetched successfully',
-                    'packages' =>  $records 
+                    'packages' =>  $records
                 ], 200);
             }
             else{
@@ -94,6 +94,80 @@ class UmrahPackageController extends Controller
             return response()->json(['error' => $th->getMessage(), 'data' => null], 500);
         }
     }
+
+
+
+
+    public function update(Request $request)
+    {
+        try {
+            $data = $request->all();
+
+            $validation = Validator::make($data, [
+                'id'=>'required',
+                'name' => 'string',
+                'details' => 'string',
+                'managed_by' => 'string',
+                'duration' => 'string',
+                'person' => 'sometimes|required', // Only validate if present
+                'type' => 'string',
+                'tags' => 'array',
+                'price' => 'numeric',
+                'package_status' => 'string',
+            ]);
+
+            if ($validation->fails()) {
+                return ResponseService::validationErrorResponse($validation->errors()->first());
+            } else {
+
+                // Find the UmrahPackage by packageId
+                $ummrah_package = UmrahPackage::findOrFail($data["id"]);
+
+                // Prepare an array of fields to update
+                $updateData = [];
+                foreach (['name', 'details', 'managed_by', 'duration', 'person', 'type', 'tags', 'price', 'package_status'] as $field) {
+                    if (isset($data[$field])) {
+                        $updateData[$field] = $data[$field];
+                    }
+                }
+
+                // Update UmrahPackage fields
+                $ummrah_package->update($updateData);
+
+                // Update or create AgentPackageActivity
+                /*
+                $activityimagePath = $data['acitivity_image']->store('public/images');
+                $activityimageUrl = asset(str_replace('public', 'storage', $activityimagePath));
+                */
+                $packageactivities = AgentPackageActivity::updateOrCreate(
+                    ['package_id' => $ummrah_package->id],
+                    [
+                        'name' => $data['activity_name'] ?? $ummrah_package->agentPackageActivity->name,
+                        'description' => $data['activity_description'] ?? $ummrah_package->agentPackageActivity->description,
+                        'user_id' => auth()->user()->id,
+                        'package_id' => $ummrah_package->id,
+                        'image' => $activityimageUrl,
+                    ]
+                );
+
+                // Update HotelPackage entries
+                $ummrah_package->hotelPackages()->delete(); // Delete existing entries
+                if (isset($data['hotel_id']) && is_array($data['hotel_id'])) {
+                    foreach ($data['hotel_id'] as $hotelId) {
+                        HotelPackage::create([
+                            'package_id' => $ummrah_package->id,
+                            'hotel_id' => $hotelId,
+                        ]);
+                    }
+                }
+
+                return response()->json(['data' => $ummrah_package, 'messsage' => "package has been updated successfully "], 200);
+            }
+        } catch (\Throwable $th) {
+            return response()->json(['error' => $th->getMessage(), 'data' => null], 500);
+        }
+    }
+
 
     /**
      * Show the form for creating a new resource.
@@ -160,7 +234,27 @@ class UmrahPackageController extends Controller
         }
     }
 
-   
 
-   
-}
+    public function deletePackage(Request $request)
+    {
+        try {
+            $data = $request->all();
+            $validation = validator::make($data, [
+                'id' => 'required|exists:umrah_packages,id',
+            ]);
+            if ($validation->fails()) {
+                return ResponseService::validationErrorResponse($validation->errors()->first());
+            } else {
+
+/*                $delId = ImageCategory::where('image_type', 'Package')->first();
+                AgentImage::where("type_id", $data["id"])->where('category_id', $delId)->delete();
+                PackageKey::where("package", $data["id"])->delete();*/
+                UmrahPackage::where('id', $data['id'])->delete();
+
+                return response()->json(['code' => 200, 'message' => 'Package Successfully deleted'], 200);
+            };
+        } catch (\Throwable $th) {
+            return response()->json(['error' => $$th->getMessage(),]);
+        }
+    }
+};

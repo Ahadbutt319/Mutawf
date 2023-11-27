@@ -5,11 +5,12 @@ namespace App\Http\Controllers\api;
 use App\Models\Transport;
 use App\Models\TransportCar;
 use Illuminate\Http\Request;
+use App\Models\TransportBooking;
+use App\Services\ResponseService;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\StoreTransportRequest;
 use App\Http\Requests\UpdateTransportRequest;
-use App\Models\TransportBooking;
 use Symfony\Component\Mailer\Transport\Transports;
 
 class TransportController extends Controller
@@ -38,6 +39,30 @@ class TransportController extends Controller
     /**
      * Show the form for creating a new resource.
      */
+
+    public function delete(Request $request){
+        try {
+            $data = $request->all();
+            $validation = validator::make($data, [
+                'id' => 'required|exists:transports,id',
+            ]);
+            if ($validation->fails()) {
+                return ResponseService::validationErrorResponse($validation->errors()->first());
+            } else {
+
+/*                $delId = ImageCategory::where('image_type', 'Package')->first();
+                AgentImage::where("type_id", $data["id"])->where('category_id', $delId)->delete();
+                PackageKey::where("package", $data["id"])->delete();*/
+                Transport::where('id', $data['id'])->delete();
+
+                return response()->json(['code' => 200, 'message' => 'Hotel Successfully deleted'], 200);
+            };
+        } catch (\Throwable $th) {
+            return response()->json(['error' => $$th->getMessage(),]);
+        }
+    }
+
+
     public function create(Request $request)
     {
         try {
@@ -133,9 +158,9 @@ class TransportController extends Controller
             $available = $luggages->is_active;
             //  First check transport is available
             if ($available  ==  1) {
-                //  second check passanger can sit in car not 
+                //  second check passanger can sit in car not
                 if ($request->passengers  ==  $luggages->capacity) {
-                    //  third bags are allowed or not 
+                    //  third bags are allowed or not
                     if ($request->luggages ==  $luggages->cars[0]['bags']) {
                         $data =    TransportBooking::create([
                             'name' => $request->name,

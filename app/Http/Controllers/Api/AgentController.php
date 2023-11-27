@@ -31,30 +31,66 @@ class AgentController extends Controller
 {
 
 
+    public function deleteHotel(Request $request){
+
+        try {
+            $data = $request->all();
+            $validation = validator::make($data, [
+                'id' => 'required|exists:agent_hotels,id',
+            ]);
+            if ($validation->fails()) {
+                return ResponseService::validationErrorResponse($validation->errors()->first());
+            } else {
+
+/*                $delId = ImageCategory::where('image_type', 'Package')->first();
+                AgentImage::where("type_id", $data["id"])->where('category_id', $delId)->delete();
+                PackageKey::where("package", $data["id"])->delete();*/
+                AgentHotel::where('id', $data['id'])->delete();
+
+                return response()->json(['code' => 200, 'message' => 'Hotel Successfully deleted'], 200);
+            };
+        } catch (\Throwable $th) {
+            return response()->json(['error' => $$th->getMessage(),]);
+        }
+    }
+
     public function addGroundServices(Request $request)
     {
 
-        $data = $request->All();
-        $validation = validator::make($data, [
-            'hotels' => 'required|string|exists:AgentHotel,hotel_name',
+        $rules = [
             'guider_name' => 'required|string',
-            'tour_location' => 'string',
-            'services' => 'required|exists:AgentServices,name', // Adjust validation rules as needed
+            'tour_location' => 'required|string',
+            'services' => 'required|array',
+            'description' => 'required|string',
+            'price' => 'required|numeric',
+            'activities' => 'required|array',
+            'title' => 'required|string',
+        ];
+
+        // Validate the request data
+        $validator = Validator::make($request->all(), $rules);
+
+        // If validation fails, return the errors
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 400);
+        }
+
+        // Insert data into the ground_services table
+        $data = $request->only([
+            'guider_name',
+            'tour_location',
+            'services',
+            'description',
+            'price',
+            'activities',
+            'title',
         ]);
 
-        if ($validation->fails()) {
-            return ResponseService::validationErrorResponse($validation->errors()->first());
-        } else {
-            $agentId = User::where('id', auth()->user()->id)->pluck('id')->first();
-            $groundService = new GroundService;
-            $groundService->added_by = $agentId;
-            $groundService->hotels = $data['hotels'];
-            $groundService->guider_name = $data['guider_name'];
-            $groundService->tour_location = $data['tour_location'];
-            $groundService->services = $data['services'];
-            $groundService->save();
-            return ResponseService::successResponse('You Service is Added Successfully !', $groundService);
-        }
+        $data['added_by'] = auth()->user()->id;
+
+        GroundService::create($data);
+
+        return response()->json(['message' => 'Ground service created successfully'], 201);
     }
 
     public function getGroundServices()
@@ -777,9 +813,9 @@ class AgentController extends Controller
                 return ResponseService::validationErrorResponse($validation->errors()->first());
             } else {
 
-                $delId = ImageCategory::where('image_type', 'Package')->first();
+/*                $delId = ImageCategory::where('image_type', 'Package')->first();
                 AgentImage::where("type_id", $data["id"])->where('category_id', $delId)->delete();
-                PackageKey::where("package", $data["id"])->delete();
+                PackageKey::where("package", $data["id"])->delete();*/
                 AgentPackage::where('id', $data['id'])->delete();
 
                 return response()->json(['code' => 200, 'message' => 'Package Successfully deleted'], 200);
