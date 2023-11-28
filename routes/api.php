@@ -6,16 +6,18 @@ use Illuminate\Bus\BusServiceProvider;
 use App\Http\Controllers\SendSmsController;
 use App\Http\Controllers\Api\FaqsController;
 use App\Http\Controllers\Api\UserController;
-use App\Http\Controllers\Api\AgentController;
+use App\Http\Controllers\api\AgentController;
 use App\Http\Controllers\Api\HotelController;
 use App\Http\Controllers\Api\FlightController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Api\AboutUsController;
+use App\Http\Controllers\Api\BookingController;
 use App\Http\Controllers\Api\CompanyController;
 use App\Http\Controllers\Api\ContentController;
 use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\LanguageController;
 use App\Http\Controllers\Api\UserCardController;
+use App\Http\Controllers\api\TransportController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Api\UmrahPackageController;
 use App\Http\Controllers\Auth\VerificationController;
@@ -25,8 +27,6 @@ use App\Http\Controllers\Api\TermAndConditionController;
 use App\Http\Controllers\Api\superadmin\ComplainController;
 use App\Http\Controllers\Api\superadmin\SuperadmiController;
 use App\Http\Controllers\Api\superadmin\ComplainTypeController;
-use App\Http\Controllers\Api\BookingController;
-use App\Http\Controllers\api\TransportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -68,8 +68,13 @@ Route::group(['middleware' => ['local']], function () {
         route::get('/get-operators', [AgentController::class, 'getOperators']);
         route::post('/become-operator', [AgentController::class, 'becomeAnOperator']);
         route::post('/create-package', [UmrahPackageController::class, 'create']);
+        route::post('/update-package', [UmrahPackageController::class, 'update']);
+
         route::get('/packages', [AgentController::class, 'getGeneralPackage']);
         route::post('/add-hotels', [AgentController::class, 'addHotel']);
+
+        route::post('/delete-hotels', [AgentController::class, 'deleteHotel']);
+
         route::get('/get-hotels', [AgentController::class, 'getHotels']);
         route::post('/get-hotel', [AgentController::class, 'getHotelDetial']);
         route::post('/add-ImageCategory', [AgentController::class, 'addImageCategory']);
@@ -80,9 +85,9 @@ Route::group(['middleware' => ['local']], function () {
 
         route::post('/add-visa', [AgentController::class, 'addVisa']);
         route::post('/delete-visa', [AgentController::class, 'deleteVisa']);
-        route::post('/delete-package', [AgentController::class, 'deletePackage']);
+        route::post('/delete-package', [UmrahPackageController::class, 'deletePackage']);
         route::post('/delete-operator', [AgentController::class, 'deleteOperator']);
-        route::post('/update-package',[AgentController::class,'updatePackage']);
+//        route::post('/update-package',[AgentController::class,'updatePackage']);
         route::post('/update-operator',[AgentController::class,'updateOperator']);
         route::post('/add-groundService',[AgentController::class,'addGroundServices']);
         route::post('/groundService',[AgentController::class,'getGroundServices']);
