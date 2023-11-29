@@ -13,8 +13,16 @@ class GroundService extends Model
         'added_by',
         'hotels',
         'guider_name',
-        'tour_location',
-        'services'
+        'pu_location',
+        'services',
+        'persons',
+        'price',
+        'description',
+        'start_date',
+        'image',
 ];
+protected $casts = [
+    'services' => 'json',
 
+];
 }
