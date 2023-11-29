@@ -56,7 +56,7 @@ class AgentHotel extends Model
             $array = []; 
             $array['id'] = $k->id;
             $array['sku'] = $k->sku;
-            $array['room_category_id'] = RoomCategory::where('id', $k->room_category_id)->value('name');
+            $array['room_category'] = RoomCategory::where('id', $k->room_category_id)->value('name');
             $array['price_per_night'] = $k->price_per_night;
             $array['name'] = $k->name;
             $array['room_number'] = $k->room_number;
