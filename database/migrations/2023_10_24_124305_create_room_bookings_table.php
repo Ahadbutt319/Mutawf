@@ -24,6 +24,7 @@ return new class extends Migration
             $table->boolean('is_available')->default(true);
             $table->string('capacity');
             $table->foreignId('room_hotel_id')->references('id')->on('agent_hotels');
+            $table->integer('quantity');
             $table->timestamps();
         });
     }

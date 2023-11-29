@@ -14,13 +14,13 @@ class RoomCategory extends Seeder
     public function run(): void
     {
         DB::table('room_categories')->insert([
-             ['name'=>'A+',
+             ['name'=>'Dulex King',
             'luxuries'=>'Swimming Pool,Two Washrooms,Led 44 inches,Double Bed',
             'price'=>'200$'],
-            ['name'=>'A',
+            ['name'=>'Executive King',
             'luxuries'=>'Two Washrooms,Led 44 inches,Single Bed',
             'price'=>'150$'],
-            ['name'=>'B+',
+            ['name'=>'Royal King',
             'luxuries'=>'Double Bed',
             'price'=>'100$'],
         ]);

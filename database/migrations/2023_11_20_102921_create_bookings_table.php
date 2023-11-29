@@ -23,6 +23,7 @@ return new class extends Migration
             $table->enum('status', ['pending', 'confirmed', 'in progress', 'cancelled']);
             $table->string('payment_id')->nullable();
             $table->dateTime('location')->nullable();
+            $table->foreignId('room_id')->references('id')->on('room_bookings')->onDelete('cascade');
             $table->timestamps();
         });
     }
