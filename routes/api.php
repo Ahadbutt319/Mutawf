@@ -17,7 +17,7 @@ use App\Http\Controllers\Api\ContentController;
 use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\LanguageController;
 use App\Http\Controllers\Api\UserCardController;
-use App\Http\Controllers\api\TransportController;
+use App\Http\Controllers\Api\TransportController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Api\UmrahPackageController;
 use App\Http\Controllers\Auth\VerificationController;
@@ -113,7 +113,7 @@ Route::group(['middleware' => ['local']], function () {
             Route::post('/book/transport', [TransportController::class, 'booking']);
             Route::get('/booked/transport', [TransportController::class, 'getAllBooking']);
             route::get('/get-hotels', [AgentController::class, 'getHotels']);
-            route::post('/hotel-detail', [AgentController::class, 'getHotelDetial']);
+            route::post('/hotel-detail', [AgentController::class, 'getHotelDetail']);
             route::post('/search-hotel', [AgentController::class, 'searchHotel']);
             route::post('/booking', [BookingController::class, 'booking']);
             route::post('/get-bookings', [BookingController::class, 'getBookingDetails']);
