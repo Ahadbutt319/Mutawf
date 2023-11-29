@@ -668,6 +668,7 @@ class AgentController extends Controller
                     'is_available' => $room['is_available'],
                     'room_category_id' =>  $room['room_category_id'],
                     "capacity" => $room['capacity'],
+                    "quantity" => $room['quantity'],
                     "added_by" => auth()->user()->id,
                     "room_hotel_id" =>  $agentHotel->id
                 ]);

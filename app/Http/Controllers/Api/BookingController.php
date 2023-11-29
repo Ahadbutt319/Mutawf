@@ -13,7 +13,9 @@ class BookingController extends Controller
 {
    public function booking(Request $request)
    {
+
     try {
+      
           $hotelBooking = AgentHotel::find($request->hotel_id)->bookings()->create([
             'checkin_time' => $request->checkin_time,
             'checkout_time' => $request->checkout_time,
@@ -21,6 +23,7 @@ class BookingController extends Controller
             'payment_id'=> $request->payment_id,
             'name'=> $request->name,
             'email'=>$request->email,
+            'room_id'=> $request->room_id,
             'staus'=> 'pending'
         ]);
         return response()->json(['message' => 'Hotel booking created successfully', 'booking' => $hotelBooking]);   

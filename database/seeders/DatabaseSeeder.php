@@ -31,7 +31,7 @@ class DatabaseSeeder extends Seeder
             ImageCategoy::class,
             ContentType::class,
             ComplaintStatus::class,
-            UmrahActivitySeeder::class
+
         ]);
     }
 }

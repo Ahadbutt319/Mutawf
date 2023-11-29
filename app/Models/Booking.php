@@ -15,6 +15,7 @@ class Booking extends Model
         'user_id',
         'payment_id',
         'email',
+        'room_id',
     ];
 
     // Define the polymorphic relationship
