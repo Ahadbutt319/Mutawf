@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\BookingController;
 use App\Http\Controllers\Api\CompanyController;
 use App\Http\Controllers\Api\ContentController;
 use App\Http\Controllers\Api\CustomerController;
+use App\Http\Controllers\Api\GroundServicesContoller;
 use App\Http\Controllers\Api\LanguageController;
 use App\Http\Controllers\Api\UserCardController;
 use App\Http\Controllers\Api\TransportController;
@@ -102,6 +103,11 @@ Route::group(['middleware' => ['local']], function () {
         Route::get('/auth-data', [UserController::class, 'authData']);
         Route::post('/update-profile', [UserController::class, 'updateUser']);
         Route::post('/companies', [CompanyController::class, 'store']);
+        
+        //ground services 
+        Route::group(['prefix' => 'ground-service'], function () {
+            Route::post('/create', [GroundServicesContoller::class,'create']);
+            });
         //  ALL Customer routes
         Route::group(['prefix' => 'customer'], function () {
 
