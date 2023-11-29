@@ -6,7 +6,7 @@ use Illuminate\Bus\BusServiceProvider;
 use App\Http\Controllers\SendSmsController;
 use App\Http\Controllers\Api\FaqsController;
 use App\Http\Controllers\Api\UserController;
-use App\Http\Controllers\api\AgentController;
+use App\Http\Controllers\Api\AgentController;
 use App\Http\Controllers\Api\HotelController;
 use App\Http\Controllers\Api\FlightController;
 use App\Http\Controllers\Auth\LoginController;
