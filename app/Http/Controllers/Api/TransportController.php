@@ -6,8 +6,8 @@ use App\Models\Transport;
 use App\Models\TransportCar;
 use Illuminate\Http\Request;
 use App\Models\TransportBooking;
-use App\Services\ResponseService;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\StoreTransportRequest;
 use App\Http\Requests\UpdateTransportRequest;
@@ -29,7 +29,7 @@ class TransportController extends Controller
             return response()->json([
                 'code' => 200,
                 'message' => 'Transport fetched successfully',
-                'packages' => $records
+                'transportation' => $records
             ], 200);
         } catch (\Exception $exception) {
             return response()->json(['error' =>  $exception->getMessage(), 'data' => null], 500);
@@ -40,7 +40,8 @@ class TransportController extends Controller
      * Show the form for creating a new resource.
      */
 
-    public function delete(Request $request){
+    public function delete(Request $request)
+    {
         try {
             $data = $request->all();
             $validation = validator::make($data, [
@@ -50,7 +51,7 @@ class TransportController extends Controller
                 return ResponseService::validationErrorResponse($validation->errors()->first());
             } else {
 
-/*                $delId = ImageCategory::where('image_type', 'Package')->first();
+                /*                $delId = ImageCategory::where('image_type', 'Package')->first();
                 AgentImage::where("type_id", $data["id"])->where('category_id', $delId)->delete();
                 PackageKey::where("package", $data["id"])->delete();*/
                 Transport::where('id', $data['id'])->delete();
@@ -106,8 +107,11 @@ class TransportController extends Controller
                 'lng' => $request->lng,
                 'user_id' => auth()->user()->id
             ]);
+            $ImageData =  $request->file('image');
+            $imagePath =   $ImageData->move('trasport_car_image/'); // Store the image file
+            $imageUrl = asset(str_replace('public', 'storage', $imagePath)); // Generate the image URL
             $car = TransportCar::create([
-                'image' => $request->image,
+                'image' =>    $imageUrl,
                 'type' => $request->car_type,
                 'name' => $request->name,
                 'bags' => $request->bags,
@@ -214,9 +218,45 @@ class TransportController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Transport $transport)
+    public function search(Request $request)
     {
-        //
+        try {
+            $query = Transport::query();
+            // car type
+            if ($request->has('car_type')) {
+                $query->where('type', 'like', '%' . $request->input('car_type') . '%');
+            }
+            //persons
+            if ($request->has('persons')) {
+                $persons = (int) $request->input('persons');
+
+                $query->where('capacity', '>=', $persons);
+            }
+            // Latitude and Longitude search
+            if ($request->has('lat') && $request->has('lng')) {
+                $lat = (float) $request->input('lat');
+                $lng = (float) $request->input('lng');
+
+                // You can customize the distance range based on your needs
+                $distance = 10; // For example, search within a 10-kilometer radius
+
+                $query->whereRaw("
+        ST_Distance_Sphere(
+            point(lng, lat),
+            point(?, ?)
+        ) < ?
+    ", [$lng, $lat, $distance * 1000]); // Multiply by 1000 to convert kilometers to meters
+            }
+
+            $results = $query->get();
+            // You can customize the returned data as per your requirements
+            $formattedResults = $results->map(function ($hotel) {
+                return $hotel->getdata();
+            });
+            return response()->json(['message' => 'Tarnsportation fetched successfully', 'transporation' => $formattedResults], 200);
+        } catch (\Throwable $th) {
+            return response()->json(['error' => $th->getMessage()]);
+        }
     }
 
     /**

@@ -468,12 +468,8 @@ class AgentController extends Controller
             $category = ImageCategory::where('image_type', 'Visa')->pluck('id')->first();
             foreach ($images as $image) {
                 if ($image->isValid()) {
-
                     $imagePath = $image->move('public/images'); // Store the image file
-
                     $imageUrl = asset(str_replace('public', 'storage', $imagePath)); // Generate the image URL
-
-
                     $agentImage = new AgentImage();
                     $agentImage->type_id = $visa->id;
                     $agentImage->category_id = $category;
@@ -522,12 +518,8 @@ class AgentController extends Controller
             $category = ImageCategory::where('image_type', 'Transportation')->pluck('id')->first();
             foreach ($images as $image) {
                 if ($image->isValid()) {
-
                     $imagePath = $image->move('public/images'); // Store the image file
-
                     $imageUrl = asset(str_replace('public', 'storage', $imagePath)); // Generate the image URL
-
-
                     $agentImage = new AgentImage();
                     $agentImage->type_id = $agentTransportation->id;
                     $agentImage->category_id = $category;
@@ -649,6 +641,9 @@ class AgentController extends Controller
                 'checkin_time' => $data['checkin_time'],
                 'checkout_time' => $data['checkout_time'],
                 'is_active' => $data['is_active'],
+                'parking' => $data['parking'],
+                'wifi' => $data['wifi'],
+                'food' => $data['food'],
                 'added_by' => auth()->user()->id,
             ]);
             foreach ($request->hotel_images as $image) {
@@ -663,8 +658,8 @@ class AgentController extends Controller
                 ]);
             }
             foreach ($request->rooms as $room) {
-
                 $room_hotel = RoomBooking::create([
+                    'name' =>  $room['name'],
                     'sku' => 'Room_' . uniqid(),
                     'price_per_night' => $room['price_per_night'],
                     'room_number' => $room['room_number'],
@@ -855,10 +850,11 @@ class AgentController extends Controller
     {
         try {
             $data = AgentHotel::where('id', $request->id)->with('hotel_images')->with('rooms.roomImages')->first();
+            $record =  $data->getdetails();
             return response()->json([
                 'code' => 200,
                 'message' => 'Hotel fetched successfully',
-                'hotel_detail' =>  $data,
+                'hotels' =>  $record 
 
             ], 200);
         } catch (\Throwable $th) {

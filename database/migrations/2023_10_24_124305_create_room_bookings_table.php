@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('added_by');
             $table->foreignId('room_category_id')->references('id')->on('room_categories');
             $table->string('price_per_night');
+            $table->string('name');
             $table->string('room_number');
             $table->string('floor_number');
             $table->string('bed_type');

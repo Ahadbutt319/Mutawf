@@ -28,6 +28,8 @@ use App\Http\Controllers\Api\superadmin\ComplainController;
 use App\Http\Controllers\Api\superadmin\SuperadmiController;
 use App\Http\Controllers\Api\superadmin\ComplainTypeController;
 
+
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -82,7 +84,6 @@ Route::group(['middleware' => ['local']], function () {
         route::get('/operators', [AgentController::class, 'fetchOperators']);
         // route::post('/add-transportation', [AgentController::class, 'addTransportation']);
         Route::post('/add-transportation', [TransportController::class, 'create']);
-
         route::post('/add-visa', [AgentController::class, 'addVisa']);
         route::post('/delete-visa', [AgentController::class, 'deleteVisa']);
         route::post('/delete-package', [UmrahPackageController::class, 'deletePackage']);
@@ -103,11 +104,16 @@ Route::group(['middleware' => ['local']], function () {
         Route::post('/companies', [CompanyController::class, 'store']);
         //  ALL Customer routes
         Route::group(['prefix' => 'customer'], function () {
+
+            // transport
+            Route::group(['prefix' => 'transport'], function () {
+            Route::post('/search', [TransportController::class,'search']);
+            });
             route::get('/get-transport', [TransportController::class, 'index']);
             Route::post('/book/transport', [TransportController::class, 'booking']);
             Route::get('/booked/transport', [TransportController::class, 'getAllBooking']);
             route::get('/get-hotels', [AgentController::class, 'getHotels']);
-            route::post('/hotel-detail', [AgentController::class, 'getHotelDetail']);
+            route::post('/hotel-detail', [AgentController::class, 'getHotelDetial']);
             route::post('/search-hotel', [AgentController::class, 'searchHotel']);
             route::post('/booking', [BookingController::class, 'booking']);
             route::post('/get-bookings', [BookingController::class, 'getBookingDetails']);

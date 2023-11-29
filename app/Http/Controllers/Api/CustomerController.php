@@ -13,6 +13,7 @@ use App\Models\PackageBooking;
 use App\Mail\ReachusNotification;
 use App\Models\PackageBookedPerson;
 use App\Http\Controllers\Controller;
+use App\Models\VisaBooking;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -48,7 +49,7 @@ class CustomerController extends Controller
 
                 $data  = $request->all();
 
-                $get_price =  UmrahPackage::where('id', $data['package_id'])->pluck('price')->first();
+                $get_price =  UmrahPackage::where('id', $data['package_id'])->value('price');
                 $total_amount = $data['quantity'] * $get_price;
                 //if customer have visa already 
 
@@ -59,7 +60,7 @@ class CustomerController extends Controller
                         'quantity' => 'required|integer|min:1',
                         'to' => 'required|string',
                         'payment_status' => 'required|boolean',
-                        'visa_status' => 'required|boolean',
+                        
                     ]);
                     if ($validator->fails()) {
                         return response()->json(['errors' => $data], 422);
@@ -107,6 +108,11 @@ class CustomerController extends Controller
                                 "booking_id" => $booking->id
                             ]);
                         }
+
+
+
+
+
                     } else {
                         foreach ($data['visas'] as $visa) {
                             $visas = Visa::create([
@@ -126,7 +132,7 @@ class CustomerController extends Controller
                         'quantity' => 'required|integer|min:1',
                         'to' => 'required|string',
                         'payment_status' => 'required|boolean',
-                        'visa_status' => 'required|boolean',
+                       
                     ]);
 
                     if ($validator->fails()) {
@@ -177,7 +183,7 @@ class CustomerController extends Controller
                             // Store binary data in storage
                             $passportPerosnImagePath = 'passport_person_images/' . uniqid() . '.jpg';
                             Storage::put($passportPerosnImagePath, $passportPerosnphoto);
-                             Visa::create([
+                           $visa_data =   Visa::create([
                                 "passport_number" => $visa['passport_number'],
                                 "nationality" => $visa['nationality'],
                                 "id_number" => $visa['id_number'],
@@ -186,6 +192,12 @@ class CustomerController extends Controller
                                 "passport_image" => $passportImagePath,
                                 "booking_id" => $booking->id
                             ]);
+                            VisaBooking::create([
+                                'visas_id'=> $visa_data->id,
+                                'user_id'=> auth()->user()->id,
+                                'status'=> 'pending',
+                            ]);
+
                         }
                     } else {
                         foreach ($data['visas'] as $visa) {

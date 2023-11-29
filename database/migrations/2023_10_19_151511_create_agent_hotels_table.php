@@ -17,12 +17,14 @@ return new class extends Migration
             $table->string('private_transport');
             $table->datetime('checkin_time')->nullable();
             $table->datetime('checkout_time')->nullable();
-            
             $table->boolean('is_active')->default(true);
             $table->string('location');
             $table->string('luxuries');
             $table->text('details');
             $table->foreignId('added_by')->constrained('users')->nullable();
+            $table->boolean('parking')->default(true);
+            $table->string('food');
+            $table->string('wifi');
             $table->timestamps();
         });
     }
