@@ -855,8 +855,7 @@ class AgentController extends Controller
             return response()->json([
                 'code' => 200,
                 'message' => 'Hotel fetched successfully',
-                'hotek_detail' =>  $record 
-
+                'hotel_detail' =>  $record 
             ], 200);
         } catch (\Throwable $th) {
             return response()->json(['error' => $$th->getMessage(),]);
