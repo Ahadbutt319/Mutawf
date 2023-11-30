@@ -91,7 +91,9 @@ Route::group(['middleware' => ['local']], function () {
         route::post('/delete-operator', [AgentController::class, 'deleteOperator']);
 //        route::post('/update-package',[AgentController::class,'updatePackage']);
         route::post('/update-operator',[AgentController::class,'updateOperator']);
-        route::post('/add-groundService',[AgentController::class,'addGroundServices']);
+       // route::post('/add-groundService',[AgentController::class,'addGroundServices']);
+ //       route::post('/update-groundService',[AgentController::class,'updateGroundServices']);
+        //route::post('/delete-groundService',[AgentController::class,'deleteGroundService']);
         route::post('/groundService',[AgentController::class,'getGroundServices']);
         route::post('/update-visa',[AgentController::class,'updateVisa']);
         route::post('/update-transportation',[AgentController::class,'updateTransportation']);
@@ -103,10 +105,13 @@ Route::group(['middleware' => ['local']], function () {
         Route::get('/auth-data', [UserController::class, 'authData']);
         Route::post('/update-profile', [UserController::class, 'updateUser']);
         Route::post('/companies', [CompanyController::class, 'store']);
-        
-        //ground services 
+
+        //ground services
         Route::group(['prefix' => 'ground-service'], function () {
             Route::post('/create', [GroundServicesContoller::class,'create']);
+            Route::post('/update', [GroundServicesContoller::class,'update']);
+            Route::post('/delete', [GroundServicesContoller::class,'delete']);
+
             });
         //  ALL Customer routes
         Route::group(['prefix' => 'customer'], function () {
