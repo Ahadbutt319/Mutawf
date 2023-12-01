@@ -7,10 +7,12 @@ use App\Models\AgentHotel;
 
 use App\Models\RoomBooking;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Services\ResponseService;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Validator;
+
 class BookingController extends Controller
 {
    public function booking(Request $request)
@@ -23,12 +25,24 @@ class BookingController extends Controller
             'room_id' => 'required|exists:room_bookings,id',
             'name' => 'required|string',
             'email' => 'required|string',
+            'checkin_time' => [
+                'required',
+                'date',
+                'after_or_equal:today', // Ensures checkin_time is today or a future date
+            ],
+            'checkout_time' => [
+                'required',
+                'date',
+                Rule::notIn([$request->checkin_time]), // Ensures checkout_time is not the same as checkin_time
+                'after:' . $request->checkin_time, // Ensures checkout_time is after checkin_time
+            ],
         ]);
         if ($validation->fails()) {
             return ResponseService::validationErrorResponse($validation->errors()->first());
         }
         else{
             $rooms =  RoomBooking::where('id',$request->room_id)->first();
+            // In this module we are checking room quantity is available or not 
             if ( $rooms->quantity > 0  ) {
                 $hotelBooking = AgentHotel::find($request->hotel_id)->bookings()->create([
                     'checkin_time' => $request->checkin_time,

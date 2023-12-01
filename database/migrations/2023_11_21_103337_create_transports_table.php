@@ -16,8 +16,7 @@ return new class extends Migration
             $table->foreignId('company_id')->references('id')->on('companies')->onDelete('cascade');
             $table->foreignId('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->enum('type', ['medium car', 'small car', 'large car', 'suvs', 'people carrier', 'premium car']);
-            $table->string('lat', 50);
-            $table->string('lng', 50);
+            $table->string('location');
             $table->string('capacity');
             $table->decimal('price')->nullable();
             $table->boolean('is_active')->default(true);
@@ -60,13 +59,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('transports');
-        Schema::dropIfExists('transport_cars');
-        Schema::dropIfExists('transport_bookings');
-        Schema::table('transportation_bookings', function (Blueprint $table) {
-            $table->dropForeign(['transport_id']);
-            $table->dropForeign(['user_id']);
-        });
         Schema::table('transports', function (Blueprint $table) {
             $table->dropForeign(['company_id']);
             $table->dropForeign(['user_id']);
@@ -74,5 +66,13 @@ return new class extends Migration
         Schema::table('transport_cars', function (Blueprint $table) {
             $table->dropForeign(['transport_id']);
         });
+        Schema::table('transportation_bookings', function (Blueprint $table) {
+            $table->dropForeign(['transport_id']);
+            $table->dropForeign(['user_id']);
+        });
+        Schema::dropIfExists('transports');
+        Schema::dropIfExists('transport_cars');
+        Schema::dropIfExists('transport_bookings');
+      
     }
 };

@@ -14,6 +14,7 @@ use App\Models\AgentHotel;
 use App\Models\AgentImage;
 use App\Models\HotelImage;
 use App\Models\PackageKey;
+use App\Traits\FileUpload;
 use App\Models\RoomBooking;
 use App\Models\AgentPackage;
 use App\Models\RoomCategory;
@@ -25,13 +26,15 @@ use App\Services\ResponseService;
 use App\Models\AgentTransportation;
 use App\Http\Controllers\Controller;
 use App\Models\AgentPackageActivity;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class AgentController extends Controller
 {
 
 
-    public function deleteHotel(Request $request){
+    public function deleteHotel(Request $request)
+    {
 
         try {
             $data = $request->all();
@@ -42,7 +45,7 @@ class AgentController extends Controller
                 return ResponseService::validationErrorResponse($validation->errors()->first());
             } else {
 
-/*                $delId = ImageCategory::where('image_type', 'Package')->first();
+                /*                $delId = ImageCategory::where('image_type', 'Package')->first();
                 AgentImage::where("type_id", $data["id"])->where('category_id', $delId)->delete();
                 PackageKey::where("package", $data["id"])->delete();*/
                 AgentHotel::where('id', $data['id'])->delete();
@@ -641,6 +644,7 @@ class AgentController extends Controller
 
     public function addHotel(Request $request)
     {
+
         $data = $request->all();
         $validation = validator::make($data, [
             'hotel_name' => 'required|string',
@@ -667,12 +671,10 @@ class AgentController extends Controller
                 'added_by' => auth()->user()->id,
             ]);
             foreach ($request->hotel_images as $image) {
-                // $imageName = time() . '_' . $image['image']->getClientOriginalName();
-                // dd( $imageName);
-                // $image->move(storage_path('app/public/images'), $imageName);
+                $imageUrl = FileUpload::file($image['image'], 'public/hotel_images/');
                 $hotel_image = HotelImage::create([
                     'hotel_id' => $agentHotel->id,
-                    'image' =>  $image['image'],
+                    'image' =>  $imageUrl,
                     'image_type' =>   $image['image_type'],
 
                 ]);
@@ -693,11 +695,10 @@ class AgentController extends Controller
                     "room_hotel_id" =>  $agentHotel->id
                 ]);
                 foreach ($room['room_images'] as $room_image) {
-                    // $imageName = time() . '_' . $room_image['image']->getClientOriginalName();
-                    // $image->move(storage_path('app/public/images'), $imageName);
+                    $imageUrl = FileUpload::file($room_image['image'], 'public/room_images/');
                     $room_images = RoomImage::create([
                         'room_id' => $room_hotel->id,
-                        'image' =>  $room_image['image'],
+                        'image' =>  $imageUrl,
                         'room_image_type' => $room_image['image_type'],
                     ]);
                 }
@@ -830,7 +831,7 @@ class AgentController extends Controller
                 return ResponseService::validationErrorResponse($validation->errors()->first());
             } else {
 
-/*                $delId = ImageCategory::where('image_type', 'Package')->first();
+                /*                $delId = ImageCategory::where('image_type', 'Package')->first();
                 AgentImage::where("type_id", $data["id"])->where('category_id', $delId)->delete();
                 PackageKey::where("package", $data["id"])->delete();*/
                 AgentPackage::where('id', $data['id'])->delete();
@@ -840,7 +841,6 @@ class AgentController extends Controller
         } catch (\Throwable $th) {
             return response()->json(['error' => $$th->getMessage(),]);
         }
-
     }
 
     public function getGeneralPackage()
@@ -871,6 +871,13 @@ class AgentController extends Controller
     public function getHotelDetail(Request $request)
     {
         try {
+            $data = $request->All();
+            $validation = validator::make($data, [
+                'id' => 'required|exists:agent_hotels,id',
+            ]);
+            if ($validation->fails()) {
+                return ResponseService::validationErrorResponse($validation->errors()->first());
+            }
             $data = AgentHotel::where('id', $request->id)->with('hotel_images')->with('rooms.roomImages')->first();
             $record =  $data->getdetails();
             return response()->json([
@@ -924,7 +931,7 @@ class AgentController extends Controller
             $formattedResults = $results->map(function ($hotel) {
                 return $hotel->getdata();
             });
-            return response()->json(['message'=>'Hotels fetched successfully','hotels' => $formattedResults], 200);
+            return response()->json(['message' => 'Hotels fetched successfully', 'hotels' => $formattedResults], 200);
         } catch (\Throwable $th) {
             return response()->json(['error' => $$th->getMessage(),]);
         }

@@ -1,10 +1,13 @@
 <?php
 
 namespace App\Repositories;
-use App\Interfaces\groundServiceRepositoryInterface;
+
+use App\Traits\FileUpload;
 use App\Models\GroundService;
 use App\Models\GroundServiceActivity;
-
+use App\Interfaces\groundServiceRepositoryInterface;
+use App\Models\GroundBooking;
+      
 class groudServiceRepository implements  groundServiceRepositoryInterface
 {
 
@@ -32,25 +35,36 @@ class groudServiceRepository implements  groundServiceRepositoryInterface
     }
     public function createGroundService(array $groundServiceDetails)
     {
-        $groundservice_image =  time() . '_' . $groundServiceDetails['image']->getClientOriginalName();
-        $imagePath = $groundServiceDetails['image']->move('public/ground_service_image',$groundservice_image); // Store the image file
-        $imageUrl = asset(str_replace('public', 'storage',  $groundservice_image));
+        $imageUrl = FileUpload::file($groundServiceDetails['image'], 'public/ground_service_image/');
         $data =  GroundService::create([
-        'added_by' => auth()->id(), // Assuming you are using authentication
-        'guider_name' => $groundServiceDetails['guider_name'],
-        'pu_location' => $groundServiceDetails['pu_location'],
-        'persons' => $groundServiceDetails['persons'],
-        'price' => $groundServiceDetails['price'],
-        'description' => $groundServiceDetails['description'],
-        'services' => $groundServiceDetails['services'],
-        'start_date' => $groundServiceDetails['start_date'],
-        'image' =>  $imageUrl,
+            'added_by' => auth()->id(), // Assuming you are using authentication
+            'guider_name' => $groundServiceDetails['guider_name'],
+            'pu_location' => $groundServiceDetails['pu_location'],
+            'persons' => $groundServiceDetails['persons'],
+            'price' => $groundServiceDetails['price'],
+            'description' => $groundServiceDetails['description'],
+            'services' => $groundServiceDetails['services'],
+            'start_date' => $groundServiceDetails['start_date'],
+            'image' =>  $imageUrl,
         ]);
         foreach ($groundServiceDetails['groundserviceactivity'] as $activity) {
-        $groundserviceactivity_image =  time() . '_' . $activity['image']->getClientOriginalName();
-        $imagePath =  $activity['image']->move('public/ground_service_acitvities_images',$groundserviceactivity_image); // Store the image file
-        $AciticytimageUrl = asset(str_replace('public', 'storage',  $groundserviceactivity_image));
+            $imageUrl = FileUpload::file($activity['image'], 'public/ground_service_acitvities_images/');
             GroundServiceActivity::create([
+                'ground_Service_id' => $data->id,
+                'visit_location' =>  $activity['visit_location'],
+                'description' =>  $activity['description'],
+                'image' =>  $imageUrl,
+            ]);
+        }
+        return $data;
+    }
+    public function getAllGroundServices()
+    {
+        return GroundService::with('groundActivites')->get();
+    }
+    public function getDetailGroundServices(int $groundServiceId)
+    {
+        return GroundService::where('id', $groundServiceId)->with('groundActivites')->get();
                 'ground_Service_id'=> $data->id,
                 'visit_location'=>  $activity['visit_location'],
                 'description'=>  $activity['description'],
@@ -59,9 +73,55 @@ class groudServiceRepository implements  groundServiceRepositoryInterface
         }
         return $data ;
     }
+    public function searchGroundService(array $groundServicSearch)
+    {
 
+        $query = GroundService::query();
+
+        // Check if start_date is provided in the request
+        if (isset($groundServicSearch['start_date'])) {
+
+            $query->where('start_date', '>=', $groundServicSearch['start_date']);
+        }
+
+        // Check if persons is provided in the request
+        if (isset($groundServicSearch['persons'])) {
+            $query->where('persons', '>=', $groundServicSearch['persons']);
+        }
+
+        // Check if pu_location is provided in the request
+        if (isset($groundServicSearch['pu_location'])) {
+            $query->where('pu_location', 'like', '%' . $groundServicSearch['pu_location'] . '%');
+        }
+
+        return  $query->get();
+    }
+    public function bookGroundService(array $bookingdetail)
+    {
+    
+        $per_person_price = GroundService::where('id',$bookingdetail['ground_id'])->first();
+        $total_price =   $bookingdetail['persons']*$per_person_price['price'];
+        if ($bookingdetail['persons'] <= $per_person_price['persons']  ) {
+            $data = GroundBooking::create([
+                'user_id' => auth()->id(), // Assuming you are using authentication
+                'ground_id' => $bookingdetail['ground_id'],
+                'pu_date' => $bookingdetail['pu_date'],
+                'name' => $bookingdetail['name'],
+                'email' => $bookingdetail['email'],
+                'payment_id' => $bookingdetail['payment_id'],
+                'persons' => $bookingdetail['persons'],
+                'details' => $bookingdetail['details'],
+                'total_price' =>   $total_price ,
+            ]);      
+            $per_person_price['persons'] -= $bookingdetail['persons'];
+            $per_person_price->save();
+            return  $data;
+        }
+        else{
+            
+            return response()->json(['message' => 'perosn limit  is exceded']);   
+        }
+      
+
+    }
 }
-
-
-
-

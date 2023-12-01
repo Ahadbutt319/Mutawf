@@ -99,4 +99,80 @@ public function update(Request $request){
             'data' => $this->groudServiceRepository->createGroundService($groundServiceDetails), 'message' => 'Ground Services has been created succcessfully'
         ], 200);
     }
+    public function index()
+    {
+        return response()->json(['data' =>  $this->groudServiceRepository->getAllGroundServices()], 200);
+    }
+    public function detail(Request $request)
+    {
+        // Validation rules
+        $rules = [
+            'id' => 'required|exists:ground_services,id',
+        ];
+        // Validate the request data
+        $validator = Validator::make($request->all(), $rules,);
+        // Check if validation fails
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+        $groundServiceId = $request->id;
+
+        return response()->json([
+            'data' => $this->groudServiceRepository->getDetailGroundServices($groundServiceId), 'message' => 'Ground Services has been fetched succcessfully'
+        ], 200);
+    }
+    public function search(Request $request)
+    {
+        try {
+            // Validation rules
+            $rules = [
+                'pu_location' => 'required|string|max:255',
+                'persons' => 'required|integer|min:1',
+                'start_date' => 'required|date',
+            ];
+            // Validate the request data
+            $validator = Validator::make($request->all(), $rules);
+            // Check if validation fails
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+            $groundServicSearch = $request->all();
+            return response()->json([
+                'data' => $this->groudServiceRepository->searchGroundService($groundServicSearch), 'message' => 'Ground Services has been fetched succcessfully'
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json(['erro' => $th->getMessage()], 400);
+        }
+    }
+    public function booking(Request $request)
+    {
+        try {
+
+            $rules = [
+                
+                'ground_id' => 'required|exists:ground_services,id',
+                'pu_date' => 'required|date',
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|max:255',
+                'payment_id' => 'required',
+                'persons' => 'required|integer|min:1',
+                'details' => 'nullable|string',
+            ];
+
+            // Validate the request data
+            $validator = Validator::make($request->all(), $rules);
+            // Check if validation fails
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->errors()], 422);
+            }
+
+            $bookingdetail = $request->all();
+            return response()->json([
+                'data' => $this->groudServiceRepository->bookGroundService($bookingdetail), 'message' => 'Ground Services has been Booked succcessfully'
+            ], 200);
+
+        } catch (\Throwable $th) {
+            return response()->json(['erro' => $th->getMessage()], 400);
+        }
+    }
 }

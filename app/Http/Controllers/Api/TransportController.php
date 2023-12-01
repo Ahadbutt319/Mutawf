@@ -75,8 +75,8 @@ class TransportController extends Controller
                 'capacity' => 'required|integer',
                 'price' => 'required|numeric',
                 'details' => 'required|string',
-                'lat' => 'required|numeric',
-                'lng' => 'required|numeric',
+                'location' => 'required|string',
+
                 // 'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
                 'car_type' => 'required|string',
                 'name' => 'required|string',
@@ -103,8 +103,8 @@ class TransportController extends Controller
                 'capacity' => $request->capacity,
                 'price' => $request->price,
                 'details' => $request->details,
-                'lat' => $request->lat,
-                'lng' => $request->lng,
+                'location' => $request->location,
+                'pu_location' => $request->pu_location,
                 'user_id' => auth()->user()->id
             ]);
             $ImageData =  $request->file('image');
@@ -221,10 +221,15 @@ class TransportController extends Controller
     public function search(Request $request)
     {
         try {
+
             $query = Transport::query();
+
             // car type
             if ($request->has('car_type')) {
                 $query->where('type', 'like', '%' . $request->input('car_type') . '%');
+            }
+            if ($request->has('location')) {
+                $query->where('location', 'like', '%' . $request->input('location') . '%');
             }
             //persons
             if ($request->has('persons')) {
@@ -232,22 +237,6 @@ class TransportController extends Controller
 
                 $query->where('capacity', '>=', $persons);
             }
-            // Latitude and Longitude search
-            if ($request->has('lat') && $request->has('lng')) {
-                $lat = (float) $request->input('lat');
-                $lng = (float) $request->input('lng');
-
-                // You can customize the distance range based on your needs
-                $distance = 10; // For example, search within a 10-kilometer radius
-
-                $query->whereRaw("
-        ST_Distance_Sphere(
-            point(lng, lat),
-            point(?, ?)
-        ) < ?
-    ", [$lng, $lat, $distance * 1000]); // Multiply by 1000 to convert kilometers to meters
-            }
-
             $results = $query->get();
             // You can customize the returned data as per your requirements
             $formattedResults = $results->map(function ($hotel) {
@@ -262,9 +251,14 @@ class TransportController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateTransportRequest $request, Transport $transport)
+    public function detail(Request $request)
     {
-        //
+        try {
+            $data =    Transport::where('id', $request->id)->with('cars')->first();
+            return response()->json(['tarnsport_detail' => $data, 'messsage' => "Transportation has been fetched successfully "], 200);
+        } catch (\Throwable $th) {
+            return response()->json(['error' =>  $th->getMessage(), 'data' => null], 500);
+        }
     }
 
     /**
