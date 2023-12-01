@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class GroundService extends Model
 {
@@ -25,4 +26,8 @@ protected $casts = [
     'services' => 'json',
 
 ];
+public function groundActivites() : HasMany
+{
+  return $this->hasMany(GroundServiceActivity::class ,'ground_Service_id');
+}
 }

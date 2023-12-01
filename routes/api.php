@@ -107,21 +107,31 @@ Route::group(['middleware' => ['local']], function () {
         //ground services 
         Route::group(['prefix' => 'ground-service'], function () {
             Route::post('/create', [GroundServicesContoller::class,'create']);
+            
             });
         //  ALL Customer routes
         Route::group(['prefix' => 'customer'], function () {
-
-            // transport
+            // transports
             Route::group(['prefix' => 'transport'], function () {
             Route::post('/search', [TransportController::class,'search']);
+            Route::post('/detail', [TransportController::class,'detail']);
+            route::get('/index', [TransportController::class, 'index']);
+            Route::post('/book', [TransportController::class, 'booking']);
+            Route::get('/booked', [TransportController::class, 'getAllBooking']);
             });
-            route::get('/get-transport', [TransportController::class, 'index']);
-            Route::post('/book/transport', [TransportController::class, 'booking']);
-            Route::get('/booked/transport', [TransportController::class, 'getAllBooking']);
-            route::get('/get-hotels', [AgentController::class, 'getHotels']);
-            route::post('/hotel-detail', [AgentController::class, 'getHotelDetail']);
-            route::post('/search-hotel', [AgentController::class, 'searchHotel']);
-            route::post('/booking', [BookingController::class, 'booking']);
+            //hotels 
+            Route::group(['prefix' => 'hotel'], function () {
+                route::get('/index', [AgentController::class, 'getHotels']);
+                route::post('/detail', [AgentController::class, 'getHotelDetail']);
+                route::post('/search', [AgentController::class, 'searchHotel']);
+                route::post('/booking', [BookingController::class, 'booking']);
+            });
+            Route::group(['prefix' => 'ground-service'], function () {
+                Route::get('/index', [GroundServicesContoller::class,'index']);
+                route::post('/detail', [GroundServicesContoller::class, 'detail']);
+                route::post('/search', [GroundServicesContoller::class, 'search']);
+                route::post('/booking', [GroundServicesContoller::class, 'booking']);
+            });
             route::post('/get-bookings', [BookingController::class, 'getBookingDetails']);
             route::get('/packages', [UmrahPackageController::class, 'index']);
             route::post('/package', [UmrahPackageController::class, 'detailpackage']);
