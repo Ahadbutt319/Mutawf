@@ -54,6 +54,26 @@ class AgentController extends Controller
         }
     }
 
+    public function deleteGroundService(Request $request){
+      $data=$request->all();
+      $rules=[
+        'id'=>'required|exists:ground_services,id'
+      ];
+      $validator=validator::make($data,$rules);
+       // If validation fails, return the errors
+       if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 400);
+    }
+        else{
+            GroundService::where('id',$data['id'])->delete();
+            return response()->json(['message' =>'Ground Service Deleted'], 400);
+
+        }
+
+    }
+
+
+
     public function addGroundServices(Request $request)
     {
 
@@ -780,6 +800,7 @@ class AgentController extends Controller
         };
     }
 
+
     public function deleteOperator(Request $request)
     {
         $data = $request->all();
@@ -855,7 +876,7 @@ class AgentController extends Controller
             return response()->json([
                 'code' => 200,
                 'message' => 'Hotel fetched successfully',
-                'hotel_detail' =>  $record 
+                'hotel_detail' =>  $record
             ], 200);
         } catch (\Throwable $th) {
             return response()->json(['error' => $$th->getMessage(),]);

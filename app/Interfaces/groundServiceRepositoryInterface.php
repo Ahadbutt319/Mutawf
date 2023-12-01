@@ -2,7 +2,10 @@
 
 namespace App\Interfaces;
 
-interface groundServiceRepositoryInterface 
+interface groundServiceRepositoryInterface
 {
     public function createGroundService(array $groundServiceDetails);
+    public function deleteGroundService(int $id);
+    public function updateGroundService(array $updateDetails);
+
 }

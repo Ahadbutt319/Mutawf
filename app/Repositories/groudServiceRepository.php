@@ -5,13 +5,36 @@ use App\Interfaces\groundServiceRepositoryInterface;
 use App\Models\GroundService;
 use App\Models\GroundServiceActivity;
 
-class groudServiceRepository implements  groundServiceRepositoryInterface 
+class groudServiceRepository implements  groundServiceRepositoryInterface
 {
-    public function createGroundService(array $groundServiceDetails) 
+
+    public function deleteGroundService(int $id){
+        GroundService::where('id',$id)->delete();
+    }
+
+    public function updateGroundService(array $updateDetails){
+        $service=GroundService::where('id',$updateDetails["id"])->first();
+
+        $updateData = [];
+        foreach (['guider_name', 'pu_location', 'persons', 'price', 'description', 'services', 'start_date'] as $field) {
+            if (isset($updateDetails[$field])) {
+                $updateData[$field] = $updateDetails[$field];
+            }
+        }
+        $service->update($updateData);
+        if(isset($updateDetails['image'])){
+        //$service->image->delete();
+        $activityimagePath = $updateDetails['image']->store('public/images'); // Store the image file
+        $activityimageUrl = asset(str_replace('public', 'storage', $activityimagePath)); // Generate the image URL
+        $service->image=$activityimageUrl;
+        }
+        $service->save();
+    }
+    public function createGroundService(array $groundServiceDetails)
     {
         $groundservice_image =  time() . '_' . $groundServiceDetails['image']->getClientOriginalName();
         $imagePath = $groundServiceDetails['image']->move('public/ground_service_image',$groundservice_image); // Store the image file
-        $imageUrl = asset(str_replace('public', 'storage',  $groundservice_image));   
+        $imageUrl = asset(str_replace('public', 'storage',  $groundservice_image));
         $data =  GroundService::create([
         'added_by' => auth()->id(), // Assuming you are using authentication
         'guider_name' => $groundServiceDetails['guider_name'],
@@ -32,8 +55,8 @@ class groudServiceRepository implements  groundServiceRepositoryInterface
                 'visit_location'=>  $activity['visit_location'],
                 'description'=>  $activity['description'],
                 'image'=>  $AciticytimageUrl,
-            ]);   
-        } 
+            ]);
+        }
         return $data ;
     }
 

@@ -12,7 +12,7 @@ class GroundServicesContoller extends Controller
 {
 
     //this is  laravel Reposity  pattern code structure
-    //to understand this pattern open this link https://www.twilio.com/blog/repository-pattern-in-laravel-application 
+    //to understand this pattern open this link https://www.twilio.com/blog/repository-pattern-in-laravel-application
 
     private groundServiceRepositoryInterface $groudServiceRepository;
 
@@ -20,6 +20,53 @@ class GroundServicesContoller extends Controller
     {
         $this->groudServiceRepository = $groudServiceRepository;
     }
+
+
+public function update(Request $request){
+        $data = $request->all();
+        $validator = Validator::make($data, [
+            'id'=>'required',
+            'guider_name' => 'string',
+            'pu_location' => 'string',
+            'persons' => 'string',
+            'price' => 'string',
+            'description' => 'sometimes|required', // Only validate if present
+            'services' => 'string',
+            'start_date' => 'date',
+            'image' => '',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 400);
+        } else {
+
+        //$service = GroundService::findOrFail($data["id"]);
+        $updateDetails = $request->all();
+        return response()->json([
+            'data' => $this->groudServiceRepository->updateGroundService($updateDetails), 'message' => 'Ground Services has been updated successfully'
+        ], 200);
+
+    }
+        // Prepare an array of fields to upda
+    }
+
+    public function delete(Request $request){
+        $data=$request->all();
+        $rules=[
+          'id'=>'required|exists:ground_services,id'
+        ];
+        $validator=validator::make($data,$rules);
+         // If validation fails, return the errors
+         if ($validator->fails()) {
+          return response()->json(['errors' => $validator->errors()], 400);
+      }
+          else{
+              return response()->json([
+                'data' => $this->groudServiceRepository->deleteGroundService($data["id"]), 'message' => 'Ground Services has been deleted succcessfully'
+            ], 200);
+          }
+    }
+
     public function create(Request $request)
     {
         // Validation rules
