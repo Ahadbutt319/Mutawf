@@ -7,12 +7,34 @@ use App\Models\GroundService;
 use App\Models\GroundServiceActivity;
 use App\Interfaces\groundServiceRepositoryInterface;
 use App\Models\GroundBooking;
-
-class groudServiceRepository implements groundServiceRepositoryInterface
+      
+class groudServiceRepository implements  groundServiceRepositoryInterface
 {
+
+    public function deleteGroundService(int $id){
+        GroundService::where('id',$id)->delete();
+    }
+
+    public function updateGroundService(array $updateDetails){
+        $service=GroundService::where('id',$updateDetails["id"])->first();
+
+        $updateData = [];
+        foreach (['guider_name', 'pu_location', 'persons', 'price', 'description', 'services', 'start_date'] as $field) {
+            if (isset($updateDetails[$field])) {
+                $updateData[$field] = $updateDetails[$field];
+            }
+        }
+        $service->update($updateData);
+        if(isset($updateDetails['image'])){
+        //$service->image->delete();
+        $activityimagePath = $updateDetails['image']->store('public/images'); // Store the image file
+        $activityimageUrl = asset(str_replace('public', 'storage', $activityimagePath)); // Generate the image URL
+        $service->image=$activityimageUrl;
+        }
+        $service->save();
+    }
     public function createGroundService(array $groundServiceDetails)
     {
-
         $imageUrl = FileUpload::file($groundServiceDetails['image'], 'public/ground_service_image/');
         $data =  GroundService::create([
             'added_by' => auth()->id(), // Assuming you are using authentication
@@ -43,6 +65,13 @@ class groudServiceRepository implements groundServiceRepositoryInterface
     public function getDetailGroundServices(int $groundServiceId)
     {
         return GroundService::where('id', $groundServiceId)->with('groundActivites')->get();
+                'ground_Service_id'=> $data->id,
+                'visit_location'=>  $activity['visit_location'],
+                'description'=>  $activity['description'],
+                'image'=>  $AciticytimageUrl,
+            ]);
+        }
+        return $data ;
     }
     public function searchGroundService(array $groundServicSearch)
     {
