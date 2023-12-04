@@ -65,7 +65,7 @@ class groudServiceRepository implements  groundServiceRepositoryInterface
     }
     public function getDetailGroundServices(int $groundServiceId)
     {
-        return GroundService::where('id', $groundServiceId)->with('groundActivites')->get();
+        return GroundService::where('id', $groundServiceId)->with('groundActivites')->first();
 
     }
     public function searchGroundService(array $groundServicSearch)
