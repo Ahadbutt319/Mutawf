@@ -179,6 +179,7 @@ class CustomerController extends Controller
                             $passportImagePath = 'passport_images/' . uniqid() . '.jpg';
                             Storage::put($passportImagePath, $passportImageData);
                             // Decode base64 to binary
+                            
                             $passportPerosnphoto = base64_decode($visa['photo']);
                             // Store binary data in storage
                             $passportPerosnImagePath = 'passport_person_images/' . uniqid() . '.jpg';

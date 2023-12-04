@@ -21,7 +21,7 @@ class PackageBooking extends Model
     ];
     public function packages()
     {
-        return $this->belongsToMany(AgentPackage::class, 'bookpackages', 'package_id', 'booking_id');
+        return $this->belongsToMany(UmrahPackage::class, 'bookpackages', 'package_id', 'booking_id');
     } 
     public function getdata()
     {

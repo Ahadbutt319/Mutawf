@@ -40,6 +40,7 @@ class groudServiceRepository implements  groundServiceRepositoryInterface
             'added_by' => auth()->id(), // Assuming you are using authentication
             'guider_name' => $groundServiceDetails['guider_name'],
             'pu_location' => $groundServiceDetails['pu_location'],
+            'name' => $groundServiceDetails['name'],
             'persons' => $groundServiceDetails['persons'],
             'price' => $groundServiceDetails['price'],
             'description' => $groundServiceDetails['description'],
@@ -65,13 +66,7 @@ class groudServiceRepository implements  groundServiceRepositoryInterface
     public function getDetailGroundServices(int $groundServiceId)
     {
         return GroundService::where('id', $groundServiceId)->with('groundActivites')->get();
-                'ground_Service_id'=> $data->id,
-                'visit_location'=>  $activity['visit_location'],
-                'description'=>  $activity['description'],
-                'image'=>  $AciticytimageUrl,
-            ]);
-        }
-        return $data ;
+
     }
     public function searchGroundService(array $groundServicSearch)
     {

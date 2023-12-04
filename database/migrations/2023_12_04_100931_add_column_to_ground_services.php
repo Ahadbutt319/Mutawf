@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('agent_packages', function (Blueprint $table) {
-        $table->integer('person')->nullable();
-        $table->integer('price')->nullable();
+        Schema::table('ground_services', function (Blueprint $table) {
+            $table->string('name');
         });
     }
 
@@ -22,9 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('agent_packages', function (Blueprint $table) {
-            $table->dropColumn('person');
-            $table->dropColumn('price');
+        Schema::table('ground_services', function (Blueprint $table) {
+            $table->dropColumn('name');
         });
     }
 };
