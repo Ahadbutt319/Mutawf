@@ -10,11 +10,13 @@ class GroundService extends Model
 {
     use HasFactory;
 
+
     protected $fillable=[
         'added_by',
         'hotels',
         'guider_name',
         'pu_location',
+        'name',
         'services',
         'persons',
         'price',

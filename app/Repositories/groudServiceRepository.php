@@ -40,6 +40,7 @@ class groudServiceRepository implements  groundServiceRepositoryInterface
             'added_by' => auth()->id(), // Assuming you are using authentication
             'guider_name' => $groundServiceDetails['guider_name'],
             'pu_location' => $groundServiceDetails['pu_location'],
+            'name' => $groundServiceDetails['name'],
             'persons' => $groundServiceDetails['persons'],
             'price' => $groundServiceDetails['price'],
             'description' => $groundServiceDetails['description'],
