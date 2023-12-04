@@ -36,8 +36,5 @@ class AgentPackage extends Model
     {
         return $this->hasMany(AgentPackageActivity::class,'package_id');
     } 
-    public function packagebookings()
-    {
-        return $this->belongsToMany(PackageBooking::class, 'bookpackages', 'package_id', 'booking_id');
-    } 
+    
 }

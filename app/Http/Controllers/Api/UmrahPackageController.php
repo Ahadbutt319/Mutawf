@@ -4,6 +4,7 @@ namespace App\Http\Controllers\api;
 
 
 use App\Models\User;
+use App\Traits\FileUpload;
 use App\Models\HotelPackage;
 use App\Models\UmrahPackage;
 use Illuminate\Http\Request;
@@ -211,14 +212,14 @@ class UmrahPackageController extends Controller
                     'price' => $data['price'],
                     'package_status' => $data['package_status'],
                 ]);
-                $activityimagePath = $data['acitivity_image']->store('public/images'); // Store the image file
-                $activityimageUrl = asset(str_replace('public', 'storage', $activityimagePath)); // Generate the image URL
+               
+                $imageUrl = FileUpload::file($data['acitivity_image'], 'public/package_images/');
                 $packageactivities =   AgentPackageActivity::create([
                     'name' => $data['activity_name'],
                     'description' => $data['activity_description'],
                     'user_id' => $agentId,
                     'package_id' =>  $ummrah_package->id,
-                    'image' => $activityimageUrl,
+                    'image' =>  $imageUrl ,
                 ]);
                 $count_hotel_id = count($data['hotel_id']);
                 for ($i = 0; $i <  $count_hotel_id; $i++) {

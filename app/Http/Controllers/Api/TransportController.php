@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\api;
 
 use App\Models\Transport;
+use App\Traits\FileUpload;
 use App\Models\TransportCar;
 use Illuminate\Http\Request;
 use App\Models\TransportBooking;
@@ -107,9 +108,7 @@ class TransportController extends Controller
                 'pu_location' => $request->pu_location,
                 'user_id' => auth()->user()->id
             ]);
-            $ImageData =  $request->file('image');
-            $imagePath =   $ImageData->move('trasport_car_image/'); // Store the image file
-            $imageUrl = asset(str_replace('public', 'storage', $imagePath)); // Generate the image URL
+            $imageUrl = FileUpload::file( $request->file('image'), 'public/trasport_car_image/');
             $car = TransportCar::create([
                 'image' =>    $imageUrl,
                 'type' => $request->car_type,

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\PackageBooking;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -19,6 +20,10 @@ class UmrahPackage extends Model
     public function package_activities() :HasMany
     {
         return $this->hasMany(AgentPackageActivity::class,'package_id');
+    } 
+    public function packagebookings()
+    {
+        return $this->belongsToMany(PackageBooking::class, 'bookpackages', 'package_id', 'booking_id');
     } 
     public function hotels(): BelongsToMany
     {
@@ -78,7 +83,6 @@ class UmrahPackage extends Model
            $data['createdAt'] = date(config("app.date_format"), strtotime($this->created_at));
            return $data;
     }
-
-
+   
 }
 }

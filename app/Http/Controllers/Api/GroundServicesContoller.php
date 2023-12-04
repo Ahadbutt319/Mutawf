@@ -118,7 +118,7 @@ public function update(Request $request){
         $groundServiceId = $request->id;
 
         return response()->json([
-            'data' => $this->groudServiceRepository->getDetailGroundServices($groundServiceId), 'message' => 'Ground Services has been fetched succcessfully'
+            'detail_ground_services' => $this->groudServiceRepository->getDetailGroundServices($groundServiceId), 'message' => 'Ground Services has been fetched succcessfully'
         ], 200);
     }
     public function search(Request $request)
@@ -138,7 +138,7 @@ public function update(Request $request){
             }
             $groundServicSearch = $request->all();
             return response()->json([
-                'data' => $this->groudServiceRepository->searchGroundService($groundServicSearch), 'message' => 'Ground Services has been fetched succcessfully'
+                'ground_services' => $this->groudServiceRepository->searchGroundService($groundServicSearch), 'message' => 'Ground Services has been fetched succcessfully'
             ], 200);
         } catch (\Throwable $th) {
             return response()->json(['erro' => $th->getMessage()], 400);

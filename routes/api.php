@@ -55,7 +55,6 @@ route::post('/search-airports', [FlightController::class, 'getAirports']);
 
 
 Route::group(['middleware' => ['local']], function () {
-
     Route::post('/register', [RegisterController::class, 'register']);
     Route::post('/login', [LoginController::class, 'login']);
     Route::post('/forgot-password', [ForgotPasswordController::class, 'forgotPassword']);
@@ -66,37 +65,14 @@ Route::group(['middleware' => ['local']], function () {
     Route::post('/verify-phone', [VerificationController::class, 'verifyPhone']);
     Route::get('/locals', [LanguageController::class, 'index']);
     Route::post('locals', [LanguageController::class, 'changeLocale']);
-
     Route::group(['middleware' => ['auth:api', 'last_seen']], function () {
         route::get('/get-operators', [AgentController::class, 'getOperators']);
         route::post('/become-operator', [AgentController::class, 'becomeAnOperator']);
-        route::post('/create-package', [UmrahPackageController::class, 'create']);
-        route::post('/update-package', [UmrahPackageController::class, 'update']);
-
-        route::get('/packages', [AgentController::class, 'getGeneralPackage']);
-        route::post('/add-hotels', [AgentController::class, 'addHotel']);
-
-        route::post('/delete-hotels', [AgentController::class, 'deleteHotel']);
-
-        route::get('/get-hotels', [AgentController::class, 'getHotels']);
-        route::post('/get-hotel', [AgentController::class, 'getHotelDetial']);
         route::post('/add-ImageCategory', [AgentController::class, 'addImageCategory']);
         route::post('/become-operator', [AgentController::class, 'becomeAnOperator']);
         route::get('/operators', [AgentController::class, 'fetchOperators']);
-        // route::post('/add-transportation', [AgentController::class, 'addTransportation']);
-        Route::post('/add-transportation', [TransportController::class, 'create']);
-        route::post('/add-visa', [AgentController::class, 'addVisa']);
-        route::post('/delete-visa', [AgentController::class, 'deleteVisa']);
-        route::post('/delete-package', [UmrahPackageController::class, 'deletePackage']);
         route::post('/delete-operator', [AgentController::class, 'deleteOperator']);
-//        route::post('/update-package',[AgentController::class,'updatePackage']);
-        route::post('/update-operator',[AgentController::class,'updateOperator']);
-       // route::post('/add-groundService',[AgentController::class,'addGroundServices']);
- //       route::post('/update-groundService',[AgentController::class,'updateGroundServices']);
-        //route::post('/delete-groundService',[AgentController::class,'deleteGroundService']);
-        route::post('/groundService',[AgentController::class,'getGroundServices']);
-        route::post('/update-visa',[AgentController::class,'updateVisa']);
-        route::post('/update-transportation',[AgentController::class,'updateTransportation']);
+        route::post('/update-operator', [AgentController::class, 'updateOperator']);
         route::post('/add-card', [UserCardController::class, 'create']);
         route::post('/remove-card', [UserCardController::class, 'remove']);
         route::get('/cards', [UserCardController::class, 'showCards']);
@@ -105,22 +81,47 @@ Route::group(['middleware' => ['local']], function () {
         Route::get('/auth-data', [UserController::class, 'authData']);
         Route::post('/update-profile', [UserController::class, 'updateUser']);
         Route::post('/companies', [CompanyController::class, 'store']);
-
-        //ground services
+        //Visa  by agent
+        Route::group(['prefix' => 'visa'], function () {
+            route::post('/add', [AgentController::class, 'addVisa']);
+            route::post('/delete', [AgentController::class, 'deleteVisa']);
+            route::post('/update', [AgentController::class, 'updateVisa']);
+        });
+        //Transporatarion  by agent
+        Route::group(['prefix' => 'transport'], function () {
+            Route::post('/add', [TransportController::class, 'create']);
+            Route::post('/detail', [TransportController::class, 'detail']);
+            route::get('/index', [TransportController::class, 'index']);
+        });
+        //Hotel  by agent
+        Route::group(['prefix' => 'hotel'], function () {
+            route::post('/add', [AgentController::class, 'addHotel']);
+            route::post('/delete', [AgentController::class, 'deleteHotel']);
+            route::get('/index', [AgentController::class, 'getHotels']);
+            route::post('/detail', [AgentController::class, 'getHotelDetail']);;
+        });
+        //Ummrah package by agent
+        Route::group(['prefix' => 'ummrah-package'], function () {
+            route::post('/create', [UmrahPackageController::class, 'create']);
+            route::post('/update', [UmrahPackageController::class, 'update']);
+            route::post('/delete', [UmrahPackageController::class, 'deletePackage']);
+        });
+        //ground services by agent 
         Route::group(['prefix' => 'ground-service'], function () {
-            Route::post('/create', [GroundServicesContoller::class,'create']);
-            Route::post('/update', [GroundServicesContoller::class,'update']);
-            Route::post('/delete', [GroundServicesContoller::class,'delete']);
-            });
+            Route::get('/index', [GroundServicesContoller::class, 'index']);
+            Route::post('/create', [GroundServicesContoller::class, 'create']);
+            Route::post('/update', [GroundServicesContoller::class, 'update']);
+            Route::post('/delete', [GroundServicesContoller::class, 'delete']);
+        });
         //  ALL Customer routes
         Route::group(['prefix' => 'customer'], function () {
             // transports
             Route::group(['prefix' => 'transport'], function () {
-            Route::post('/search', [TransportController::class,'search']);
-            Route::post('/detail', [TransportController::class,'detail']);
-            route::get('/index', [TransportController::class, 'index']);
-            Route::post('/book', [TransportController::class, 'booking']);
-            Route::get('/booked', [TransportController::class, 'getAllBooking']);
+                Route::post('/search', [TransportController::class, 'search']);
+                Route::post('/detail', [TransportController::class, 'detail']);
+                route::get('/index', [TransportController::class, 'index']);
+                Route::post('/book', [TransportController::class, 'booking']);
+                Route::get('/booked', [TransportController::class, 'getAllBooking']);
             });
             //hotels 
             Route::group(['prefix' => 'hotel'], function () {
@@ -129,8 +130,9 @@ Route::group(['middleware' => ['local']], function () {
                 route::post('/search', [AgentController::class, 'searchHotel']);
                 route::post('/booking', [BookingController::class, 'booking']);
             });
+            // customer ground service
             Route::group(['prefix' => 'ground-service'], function () {
-                Route::get('/index', [GroundServicesContoller::class,'index']);
+                Route::get('/index', [GroundServicesContoller::class, 'index']);
                 route::post('/detail', [GroundServicesContoller::class, 'detail']);
                 route::post('/search', [GroundServicesContoller::class, 'search']);
                 route::post('/booking', [GroundServicesContoller::class, 'booking']);
@@ -190,11 +192,11 @@ Route::group(['middleware' => ['local']], function () {
                     route::get('/destroy/{id}', [ComplainTypeController::class, 'destroy']);
                     route::post('/update', [ComplainTypeController::class, 'update']);
                 });
-                Route::post('/submit', [ComplainController::class , 'create']);
-                Route::post('/status-change', [ComplainController::class , 'statuschange']);
-                Route::post('/admin/action', [ComplainController::class , 'adminactiononcomplain']);
-                Route::get('/all', [ComplainController::class , 'complainlist']);
-                Route::post('/detail-view', [ComplainController::class , 'detailview']);
+                Route::post('/submit', [ComplainController::class, 'create']);
+                Route::post('/status-change', [ComplainController::class, 'statuschange']);
+                Route::post('/admin/action', [ComplainController::class, 'adminactiononcomplain']);
+                Route::get('/all', [ComplainController::class, 'complainlist']);
+                Route::post('/detail-view', [ComplainController::class, 'detailview']);
             });
         });
     });
