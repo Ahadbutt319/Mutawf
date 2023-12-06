@@ -23,6 +23,7 @@ class UmrahPackageController extends Controller
     public function index()
     {
         try {
+           
             $id = auth()->user()->id;
             $user = User::find($id);
             if ($user->role->role === 'customer') {
@@ -212,7 +213,6 @@ class UmrahPackageController extends Controller
                     'price' => $data['price'],
                     'package_status' => $data['package_status'],
                 ]);
-               
                 $imageUrl = FileUpload::file($data['acitivity_image'], 'public/package_images/');
                 $packageactivities =   AgentPackageActivity::create([
                     'name' => $data['activity_name'],
@@ -246,7 +246,6 @@ class UmrahPackageController extends Controller
             if ($validation->fails()) {
                 return ResponseService::validationErrorResponse($validation->errors()->first());
             } else {
-
 /*                $delId = ImageCategory::where('image_type', 'Package')->first();
                 AgentImage::where("type_id", $data["id"])->where('category_id', $delId)->delete();
                 PackageKey::where("package", $data["id"])->delete();*/

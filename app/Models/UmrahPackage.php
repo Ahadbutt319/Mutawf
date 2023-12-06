@@ -79,7 +79,7 @@ class UmrahPackage extends Model
             }
             $data['makkah_hotel'] =   $array_makkah;
            }
-
+           $data['activities'] = $this->package_activities;
            $data['createdAt'] = date(config("app.date_format"), strtotime($this->created_at));
            return $data;
     }
