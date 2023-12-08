@@ -92,6 +92,8 @@ Route::group(['middleware' => ['local']], function () {
             Route::post('/add', [TransportController::class, 'create']);
             Route::post('/detail', [TransportController::class, 'detail']);
             route::get('/index', [TransportController::class, 'index']);
+            route::post('/update', [TransportController::class, 'update']);
+            route::post('/delete', [TransportController::class, 'delete']);
         });
         //Hotel  by agent
         Route::group(['prefix' => 'hotel'], function () {
@@ -106,7 +108,7 @@ Route::group(['middleware' => ['local']], function () {
             route::post('/update', [UmrahPackageController::class, 'update']);
             route::post('/delete', [UmrahPackageController::class, 'deletePackage']);
         });
-        //ground services by agent 
+        //ground services by agent
         Route::group(['prefix' => 'ground-service'], function () {
             Route::get('/index', [GroundServicesContoller::class, 'index']);
             Route::post('/create', [GroundServicesContoller::class, 'create']);
@@ -123,7 +125,7 @@ Route::group(['middleware' => ['local']], function () {
                 Route::post('/book', [TransportController::class, 'booking']);
                 Route::get('/booked', [TransportController::class, 'getAllBooking']);
             });
-            //hotels 
+            //hotels
             Route::group(['prefix' => 'hotel'], function () {
                 route::get('/index', [AgentController::class, 'getHotels']);
                 route::post('/detail', [AgentController::class, 'getHotelDetail']);
