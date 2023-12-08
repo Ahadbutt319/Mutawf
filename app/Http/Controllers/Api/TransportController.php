@@ -146,7 +146,8 @@ public function update(Request $request){
         // Update the related TransportCar data if car_type, name, or bags are provided
        $car=TransportCar::where('transport_id',$data["id"])->first();
         if(isset($data["image"])){
-            $car->image->delete();
+
+        Storage::delete($car->image);
        $car->image=FileUpload::file($request->file('image'), 'public/trasport_car_image/');
        }
        if(isset($data["type"])){

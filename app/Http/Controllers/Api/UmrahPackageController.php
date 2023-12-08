@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use App\Services\ResponseService;
 use App\Http\Controllers\Controller;
 use App\Models\AgentPackageActivity;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\StoreUmrahPackageRequest;
 use App\Http\Requests\UpdateUmrahPackageRequest;
@@ -152,6 +153,8 @@ class UmrahPackageController extends Controller
                     $packageactivities->description=$data["description"];
              }
              if(isset($data["image"])){
+
+                Storage::delete($packageactivities->image);
                 $packageactivities->image = FileUpload::file($data['image'], 'public/package_images/');
          }
             }
