@@ -7,6 +7,7 @@ use App\Traits\FileUpload;
 use App\Models\TransportCar;
 use Illuminate\Http\Request;
 use App\Models\TransportBooking;
+use App\Services\ResponseService;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -40,29 +41,6 @@ class TransportController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-
-    public function delete(Request $request)
-    {
-        try {
-            $data = $request->all();
-            $validation = validator::make($data, [
-                'id' => 'required|exists:transports,id',
-            ]);
-            if ($validation->fails()) {
-                return ResponseService::validationErrorResponse($validation->errors()->first());
-            } else {
-
-                /*                $delId = ImageCategory::where('image_type', 'Package')->first();
-                AgentImage::where("type_id", $data["id"])->where('category_id', $delId)->delete();
-                PackageKey::where("package", $data["id"])->delete();*/
-                Transport::where('id', $data['id'])->delete();
-
-                return response()->json(['code' => 200, 'message' => 'Hotel Successfully deleted'], 200);
-            };
-        } catch (\Throwable $th) {
-            return response()->json(['error' => $$th->getMessage(),]);
-        }
-    }
 
 
     public function create(Request $request)
@@ -122,6 +100,94 @@ class TransportController extends Controller
         }
     }
 
+
+public function update(Request $request){
+        $data=$request->all();
+    try {
+        // Find the existing transport record
+        $transport = Transport::findOrFail($data["id"]);
+
+        // Validation rules with optional parameters
+        $rules = [
+            //'company_id' => 'exists:companies,id',
+            'type' => 'string',
+            'capacity' => 'integer',
+            'price' => 'numeric',
+            'details' => 'string',
+            'location' => 'string',
+            'car_type' => 'string',
+            'name' => 'string',
+            'bags' => 'integer',
+            'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ];
+
+        // Validation messages
+        $messages = [
+            'company_id.exists' => 'The selected company does not exist.',
+            'image.mimes' => 'The image must be a file of type: jpeg, png, jpg, gif, svg.',
+        ];
+
+        // Validate the request data
+        $validator = Validator::make($request->all(), $rules, $messages);
+
+        // Check for validation errors
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 400);
+        }
+
+        // Update only the provided parameters
+        $transport->fill($request->only([
+            'company_id', 'type', 'capacity', 'price', 'details', 'location', 'pu_location',
+        ]));
+
+        // Save the updated transport data
+        $transport->save();
+
+        // Update the related TransportCar data if car_type, name, or bags are provided
+       $car=TransportCar::where('transport_id',$data["id"])->first();
+        if(isset($data["image"])){
+
+        Storage::delete($car->image);
+       $car->image=FileUpload::file($request->file('image'), 'public/trasport_car_image/');
+       }
+       if(isset($data["type"])){
+        $car->type=$data["type"];
+       }
+       if(isset($data["bags"])){
+        $car->bags=$data["bags"];
+       }
+       if(isset($data["name"])){
+        $car->name=$data["name"];
+       }
+       $car->Save();
+
+        return response()->json(['data' => $transport, 'message' => "Transportation has been updated successfully"], 200);
+    } catch (\Exception $exception) {
+        return response()->json(['error' => $exception->getMessage(), 'data' => null], 500);
+    }
+}
+
+    public function delete(Request $request){
+
+        try {
+            $data = $request->all();
+            $validation = validator::make($data, [
+                'id' => 'required|exists:transports,id',
+            ]);
+            if ($validation->fails()) {
+                return ResponseService::validationErrorResponse($validation->errors()->first());
+            } else {
+/*                $delId = ImageCategory::where('image_type', 'Package')->first();
+                AgentImage::where("type_id", $data["id"])->where('category_id', $delId)->delete();
+                PackageKey::where("package", $data["id"])->delete();*/
+                Transport::where('id', $data['id'])->delete();
+
+                return response()->json(['code' => 200, 'message' => 'Transport Successfully deleted'], 200);
+            };
+        } catch (\Throwable $th) {
+            return response()->json(['error' => $$th->getMessage(),]);
+        }
+    }
     public function booking(Request $request)
     {
         try {

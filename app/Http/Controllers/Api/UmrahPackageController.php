@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use App\Services\ResponseService;
 use App\Http\Controllers\Controller;
 use App\Models\AgentPackageActivity;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\StoreUmrahPackageRequest;
 use App\Http\Requests\UpdateUmrahPackageRequest;
@@ -23,7 +24,7 @@ class UmrahPackageController extends Controller
     public function index()
     {
         try {
-           
+
             $id = auth()->user()->id;
             $user = User::find($id);
             if ($user->role->role === 'customer') {
@@ -141,7 +142,26 @@ class UmrahPackageController extends Controller
                 $activityimagePath = $data['acitivity_image']->store('public/images');
                 $activityimageUrl = asset(str_replace('public', 'storage', $activityimagePath));
                 */
-                $packageactivities = AgentPackageActivity::updateOrCreate(
+
+                $packageactivities=AgentPackageActivity::where('package_id',$data["id"])->first();
+                $updateData2=[];
+                if(isset($packageactivities)){
+                if(isset($data["activity_name"])){
+                       $packageactivities->name=$data["activity_name"];
+                }
+                if(isset($data["description"])){
+                    $packageactivities->description=$data["description"];
+             }
+             if(isset($data["image"])){
+
+                Storage::delete($packageactivities->image);
+                $packageactivities->image = FileUpload::file($data['image'], 'public/package_images/');
+         }
+            }
+
+ $packageactivities->save();
+
+             /*   $packageactivities = AgentPackageActivity::updateOrCreate(
                     ['package_id' => $ummrah_package->id],
                     [
                         'name' => $data['activity_name'] ?? $ummrah_package->agentPackageActivity->name,
@@ -151,18 +171,7 @@ class UmrahPackageController extends Controller
                         'image' => $activityimageUrl,
                     ]
                 );
-
-                // Update HotelPackage entries
-                $ummrah_package->hotelPackages()->delete(); // Delete existing entries
-                if (isset($data['hotel_id']) && is_array($data['hotel_id'])) {
-                    foreach ($data['hotel_id'] as $hotelId) {
-                        HotelPackage::create([
-                            'package_id' => $ummrah_package->id,
-                            'hotel_id' => $hotelId,
-                        ]);
-                    }
-                }
-
+*/
                 return response()->json(['data' => $ummrah_package, 'messsage' => "package has been updated successfully "], 200);
             }
         } catch (\Throwable $th) {
