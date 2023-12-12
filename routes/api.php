@@ -98,6 +98,7 @@ Route::group(['middleware' => ['local']], function () {
         //Hotel  by agent
         Route::group(['prefix' => 'hotel'], function () {
             route::post('/add', [AgentController::class, 'addHotel']);
+            route::post('/update', [AgentController::class, 'updateHotel']);
             route::post('/delete', [AgentController::class, 'deleteHotel']);
             route::get('/index', [AgentController::class, 'getHotels']);
             route::post('/detail', [AgentController::class, 'getHotelDetail']);;

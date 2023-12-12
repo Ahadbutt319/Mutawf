@@ -211,10 +211,98 @@ class AgentController extends Controller
             return response()->json(['code' => 200, 'message' => 'Operator Successfully deleted'], 200);
         };
     }
-    //  hotel 
+    //  hotel
+
+
+    public function updateHotel(Request $request)
+    {
+        $data=$request->All();
+        $agentHotel = AgentHotel::findOrFail($data["id"]);;
+
+        $validation = validator::make($request->all(), [
+            'id'=>'required',
+            'hotel_name' => 'string',
+            'private_transport' => 'string',
+            'location' => 'string',
+            'luxuries' => 'string',
+            'details' => 'string',
+            'checkin_time' => 'string',
+            'checkout_time' => 'string',
+            'is_active' => 'boolean',
+            'parking' => 'boolean',
+            'wifi' => 'boolean',
+            'food' => 'boolean',
+        ]);
+
+        if ($validation->fails()) {
+            return ResponseService::validationErrorResponse($validation->errors()->first());
+        }
+
+        // Update hotel properties
+        $agentHotel->update($request->only([
+            'hotel_name', 'private_transport', 'location', 'luxuries', 'details',
+            'checkin_time', 'checkout_time', 'is_active', 'parking', 'wifi', 'food'
+        ]));
+
+        // Update hotel images
+        if ($request->has('hotel_images')) {
+            foreach ($request->hotel_images as $image) {
+            //    Storage::delete($packageactivities->image);
+                $imageUrl = FileUpload::file($image['image'], 'public/hotel_images/');
+                $hotelImage = HotelImage::updateOrCreate(
+                  //  ['id' => $image['id']],
+                    [
+                        'hotel_id' => $agentHotel->id,
+                        'image' => $imageUrl,
+                        'image_type' => $image['image_type'],
+                    ]
+                );
+            }
+            //$hotelImage->save();
+        }
+
+        // Update rooms
+        if ($request->has('rooms')) {
+            foreach ($request->rooms as $room) {
+                $roomHotel = RoomBooking::updateOrCreate(
+                    ['id' => $room['id']],
+                    [
+                        'name' => $room['name'],
+                        'sku' => 'Room_' . uniqid(),
+                        'price_per_night' => $room['price_per_night'],
+                        'room_number' => $room['room_number'],
+                        'floor_number' => $room['floor_number'],
+                        'bed_type' => $room['bed_type'],
+                        'is_available' => $room['is_available'],
+                        'room_category_id' => $room['room_category_id'],
+                        'capacity' => $room['capacity'],
+                        'quantity' => $room['quantity'],
+                        'added_by' => auth()->user()->id,
+                        'room_hotel_id' => $agentHotel->id,
+                    ]
+                );
+
+                // Update room images
+                if (isset($room['room_images'])) {
+                    foreach ($room['room_images'] as $room_image) {
+                        $imageUrl = FileUpload::file($room_image['image'], 'public/room_images/');
+                        $roomImages = RoomImage::updateOrCreate(
+                            ['id' => $room_image['id']],
+                            [
+                                'room_id' => $roomHotel->id,
+                                'image' => $imageUrl,
+                                'room_image_type' => $room_image['image_type'],
+                            ]
+                        );
+                    }
+                }
+            }
+        }
+
+        return ResponseService::successResponse('Your Hotel is Updated Successfully!', $agentHotel);
+    }
     public function addHotel(Request $request)
     {
-
         $data = $request->all();
         $validation = validator::make($data, [
             'hotel_name' => 'required|string',
@@ -381,7 +469,7 @@ class AgentController extends Controller
             return response()->json(['error' => $$th->getMessage(),]);
         }
     }
-    // Visa 
+    // Visa
     public function updateVisa(Request $request)
     {
         $data = $request->all();
